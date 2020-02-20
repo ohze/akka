@@ -446,6 +446,9 @@ See @ref:[Distributed Publish Subscribe in Cluster](distributed-pub-sub.md). The
 @@include[cluster.md](../includes/cluster.md) { #cluster-multidc }
 See @ref:[Cluster Multi-DC](cluster-dc.md).
 
+@@include[cluster.md](../includes/cluster.md) { #reliable-delivery }
+See @ref:[Reliable Delivery](reliable-delivery.md)
+
 ## Example project
 
 @java[@extref[Cluster example project](samples:akka-samples-cluster-java)]
