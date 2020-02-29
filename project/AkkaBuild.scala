@@ -13,6 +13,7 @@ import java.time.ZoneOffset
 import com.lightbend.paradox.projectinfo.ParadoxProjectInfoPluginKeys._
 import com.typesafe.sbt.MultiJvmPlugin.autoImport.MultiJvm
 import sbtassembly.AssemblyPlugin.autoImport._
+import dotty.tools.sbtplugin.DottyPlugin.autoImport.isDotty
 
 import sbt.Keys._
 import sbt._
@@ -105,8 +106,13 @@ object AkkaBuild {
     // compile options
     scalacOptions in Compile ++= DefaultScalacOptions,
     scalacOptions in Compile ++=
-      JdkOptions.targetJdkScalacOptions(targetSystemJdk.value, optionalDir(jdk8home.value), fullJavaHomes.value),
+      JdkOptions.targetJdkScalacOptions(targetSystemJdk.value, optionalDir(jdk8home.value), fullJavaHomes.value, isDotty.value),
     scalacOptions in Compile ++= (if (allWarnings) Seq("-deprecation") else Nil),
+    Compile / scalacOptions := {
+      val options = (Compile / scalacOptions).value
+      if (isDotty.value) options.filterNot(_ == "-Xlog-reflective-calls")
+      else options
+    },
     scalacOptions in Test := (scalacOptions in Test).value.filterNot(opt =>
       opt == "-Xlog-reflective-calls" || opt.contains("genjavadoc")),
     javacOptions in compile ++= DefaultJavacOptions ++
