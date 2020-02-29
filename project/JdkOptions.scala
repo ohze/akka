@@ -28,7 +28,9 @@ object JdkOptions extends AutoPlugin {
 
   def notOnJdk8[T](values: Seq[T]): Seq[T] = if (isJdk8) Seq.empty[T] else values
 
-  def targetJdkScalacOptions(targetSystemJdk: Boolean, jdk8home: Option[File], fullJavaHomes: Map[String, File]): Seq[String] =
+  def targetJdkScalacOptions(targetSystemJdk: Boolean, jdk8home: Option[File], fullJavaHomes: Map[String, File], isDotty: Boolean = false): Seq[String] = {
+    // dotc don't have `-release` option. Default `-target` is already `jvm-1.8`
+    val jdk11ReleaseOptions = if (isDotty) Nil else Seq("-release", "8")
     selectOptions(
       targetSystemJdk,
       jdk8home,
@@ -40,8 +42,10 @@ object JdkOptions extends AutoPlugin {
       // EnvelopeBuffer.class with 'javap -c': it should refer to
       //""java/nio/ByteBuffer.clear:()Ljava/nio/Buffer" and not
       // "java/nio/ByteBuffer.clear:()Ljava/nio/ByteBuffer". Issue #27079
-      (java8home: File) => Seq("-release", "8", "-javabootclasspath", java8home + "/jre/lib/rt.jar")
+      (java8home: File) => jdk11ReleaseOptions ++ Seq("-javabootclasspath", java8home + "/jre/lib/rt.jar")
     )
+  }
+
   def targetJdkJavacOptions(targetSystemJdk: Boolean, jdk8home: Option[File], fullJavaHomes: Map[String, File]): Seq[String] =
     selectOptions(
       targetSystemJdk,
@@ -67,6 +71,6 @@ object JdkOptions extends AutoPlugin {
 
   val targetJdkSettings = Seq(
     targetSystemJdk := false,
-    jdk8home := sys.env.get("JAVA_8_HOME").getOrElse(""),
+    jdk8home := sys.env.getOrElse("JAVA_8_HOME", ""),
   )
 }
