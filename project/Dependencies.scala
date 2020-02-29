@@ -6,6 +6,7 @@ package akka
 
 import sbt._
 import Keys._
+import dotty.tools.sbtplugin.DottyPlugin.autoImport._
 
 object Dependencies {
   import DependencyHelpers._
@@ -26,6 +27,7 @@ object Dependencies {
   val protobufJavaVersion = "3.10.0"
   val logbackVersion = "1.2.3"
 
+  val scala3Version = "0.22.0-RC1"
   val scala212Version = "2.12.10"
   val scala213Version = "2.13.1"
 
@@ -34,16 +36,16 @@ object Dependencies {
   val sslConfigVersion = "0.4.1"
 
   val Versions = Seq(
-    crossScalaVersions := Seq(scala212Version, scala213Version),
+    crossScalaVersions := Seq(scala3Version, scala212Version, scala213Version),
     scalaVersion := System.getProperty("akka.build.scalaVersion", crossScalaVersions.value.head),
     scalaCheckVersion := sys.props.get("akka.build.scalaCheckVersion").getOrElse("1.14.3"),
-    scalaTestVersion := "3.1.0",
+    scalaTestVersion := "3.1.1",
     java8CompatVersion := {
       CrossVersion.partialVersion(scalaVersion.value) match {
         // java8-compat is only used in a couple of places for 2.13,
         // it is probably possible to remove the dependency if needed.
-        case Some((2, n)) if n >= 13 => "0.9.0"
-        case _                       => "0.8.0"
+        case Some((m, n)) if m == 0 || m == 2 && n >= 13 => "0.9.0"
+        case _                                           => "0.8.0"
       }
     })
 
@@ -69,14 +71,14 @@ object Dependencies {
     val reactiveStreams = "org.reactivestreams" % "reactive-streams" % reactiveStreamsVersion // CC0
 
     // ssl-config
-    val sslConfigCore = Def.setting { "com.typesafe" %% "ssl-config-core" % sslConfigVersion } // ApacheV2
+    val sslConfigCore = Def.setting { "com.typesafe" %% "ssl-config-core" % sslConfigVersion withDottyCompat scalaVersion.value } // ApacheV2
 
     val lmdb = "org.lmdbjava" % "lmdbjava" % "0.7.0" // ApacheV2, OpenLDAP Public License
 
     val junit = "junit" % "junit" % junitVersion // Common Public License 1.0
 
     // For Java 8 Conversions
-    val java8Compat = Def.setting { "org.scala-lang.modules" %% "scala-java8-compat" % java8CompatVersion.value } // Scala License
+    val java8Compat = Def.setting { "org.scala-lang.modules" %% "scala-java8-compat" % java8CompatVersion.value withDottyCompat scalaVersion.value } // Scala License
 
     val aeronDriver = "io.aeron" % "aeron-driver" % aeronVersion // ApacheV2
     val aeronClient = "io.aeron" % "aeron-client" % aeronVersion // ApacheV2
@@ -97,11 +99,17 @@ object Dependencies {
     val logback = "ch.qos.logback" % "logback-classic" % logbackVersion // EPL 1.0
 
     object Docs {
-      val sprayJson = "io.spray" %% "spray-json" % "1.3.5" % "test"
+      val sprayJson = Def.setting { "io.spray" %% "spray-json" % "1.3.5" % "test" withDottyCompat scalaVersion.value }
       val gson = "com.google.code.gson" % "gson" % "2.8.6" % "test"
     }
 
     object Test {
+      private def scalatestplus(name: String, patch: Int = 0) = Def.setting {
+        val v = scalaTestVersion.value
+        val sv = scalaVersion.value
+        val m = "org.scalatestplus" %% name % s"$v.$patch" % "test"
+        m excludeAll ExclusionRule(scalatest.value.organization) withDottyCompat sv
+      }
       val commonsMath = "org.apache.commons" % "commons-math" % "2.2" % "test" // ApacheV2
       val commonsIo = "commons-io" % "commons-io" % "2.6" % "test" // ApacheV2
       val commonsCodec = "commons-codec" % "commons-codec" % "1.14" % "test" // ApacheV2
@@ -110,11 +118,11 @@ object Dependencies {
       val mockito = "org.mockito" % "mockito-core" % "3.2.4" % "test" // MIT
       // changing the scalatest dependency must be reflected in akka-docs/rst/dev/multi-jvm-testing.rst
       val scalatest = Def.setting { "org.scalatest" %% "scalatest" % scalaTestVersion.value % "test" } // ApacheV2
-      val scalatestJUnit = "org.scalatestplus" %% "junit-4-12" % "3.1.0.0" % "test" // ApacheV2
-      val scalatestTestNG = "org.scalatestplus" %% "testng-6-7" % "3.1.0.0" % "test" // ApacheV2
-      val scalatestScalaCheck = "org.scalatestplus" %% "scalacheck-1-14" % "3.1.0.1" % "test" // ApacheV2
-      val scalatestMockito = "org.scalatestplus" %% "mockito-1-10" % "3.1.0.0" % "test" // ApacheV2
-      val scalacheck = Def.setting { "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test" } // New BSD
+      val scalatestJUnit = scalatestplus("junit-4-12") // ApacheV2
+      val scalatestTestNG = scalatestplus("testng-6-7")// ApacheV2
+      val scalatestScalaCheck = scalatestplus("scalacheck-1-14", 1) // ApacheV2
+      val scalatestMockito = scalatestplus("mockito-3-2") // ApacheV2
+      val scalacheck = Def.setting { "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test" withDottyCompat scalaVersion.value } // New BSD
       val pojosr = "com.googlecode.pojosr" % "de.kalpatec.pojosr.framework" % "0.2.1" % "test" // ApacheV2
       val tinybundles = "org.ops4j.pax.tinybundles" % "tinybundles" % "3.0.0" % "test" // ApacheV2
       val log4j = "log4j" % "log4j" % "1.2.17" % "test" // ApacheV2
@@ -179,8 +187,8 @@ object Dependencies {
   val actorTests = l ++= Seq(
         Test.junit,
         Test.scalatest.value,
-        Test.scalatestJUnit,
-        Test.scalatestScalaCheck,
+        Test.scalatestJUnit.value,
+        Test.scalatestScalaCheck.value,
         Test.commonsCodec,
         Test.commonsMath,
         Test.scalacheck.value,
@@ -193,7 +201,7 @@ object Dependencies {
         Provided.logback,
         Provided.junit,
         Provided.scalatest.value,
-        Test.scalatestJUnit)
+        Test.scalatestJUnit.value)
 
   val remoteDependencies = Seq(netty, aeronDriver, aeronClient)
   val remoteOptionalDependencies = remoteDependencies.map(_ % "optional")
@@ -221,7 +229,7 @@ object Dependencies {
         Test.slf4jLog4j,
         Test.logback,
         Test.mockito,
-        Test.scalatestMockito)
+        Test.scalatestMockito.value)
 
   val distributedData = l ++= Seq(lmdb, Test.junit, Test.scalatest.value)
 
@@ -231,7 +239,7 @@ object Dependencies {
         Provided.levelDB,
         Provided.levelDBNative,
         Test.scalatest.value,
-        Test.scalatestJUnit,
+        Test.scalatestJUnit.value,
         Test.junit,
         Test.commonsIo,
         Test.commonsCodec)
@@ -255,7 +263,7 @@ object Dependencies {
         jacksonCore,
         jacksonAnnotations,
         jacksonDatabind,
-        jacksonScala,
+        jacksonScala withDottyCompat scalaVersion.value,
         jacksonJdk8,
         jacksonJsr310,
         jacksonParameterNames,
@@ -273,7 +281,7 @@ object Dependencies {
         Test.scalatest.value,
         Test.junit)
 
-  val docs = l ++= Seq(Test.scalatest.value, Test.junit, Docs.sprayJson, Docs.gson, Provided.levelDB)
+  val docs = l ++= Seq(Test.scalatest.value, Test.junit, Docs.sprayJson.value, Docs.gson, Provided.levelDB)
 
   val benchJmh = l ++= Seq(Provided.levelDB, Provided.levelDBNative, Compile.jctools)
 
@@ -286,14 +294,14 @@ object Dependencies {
   lazy val streamTests = l ++= Seq(
         Test.scalatest.value,
         Test.scalacheck.value,
-        Test.scalatestScalaCheck,
+        Test.scalatestScalaCheck.value,
         Test.junit,
         Test.commonsIo,
         Test.jimfs)
 
   lazy val streamTestsTck = l ++= Seq(
         Test.scalatest.value,
-        Test.scalatestTestNG,
+        Test.scalatestTestNG.value,
         Test.scalacheck.value,
         Test.junit,
         Test.reactiveStreamsTck)
