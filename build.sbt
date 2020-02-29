@@ -84,7 +84,11 @@ lazy val actor = akkaModule("akka-actor")
   .settings(OSGi.actor)
   .settings(AutomaticModuleName.settings("akka.actor"))
   .settings(unmanagedSourceDirectories in Compile += {
-    val ver = scalaVersion.value.take(4)
+    val sv = scalaVersion.value
+    val ver = CrossVersion.partialVersion(sv) match {
+      case Some((0, _)) | Some((3, _)) => "2.13"
+      case _ => sv.take(4)
+    }
     (scalaSource in Compile).value.getParentFile / s"scala-$ver"
   })
   .settings(VersionGenerator.settings)
