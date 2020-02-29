@@ -6,6 +6,7 @@ package akka
 
 import sbt._
 import Keys._
+import dotty.tools.sbtplugin.DottyPlugin.autoImport._
 
 object Dependencies {
   import DependencyHelpers._
@@ -24,6 +25,7 @@ object Dependencies {
   val protobufJavaVersion = "3.10.0"
   val logbackVersion = "1.2.3"
 
+  val scala3Version = "0.22.0-RC1"
   val scala212Version = "2.12.10"
   val scala213Version = "2.13.1"
 
@@ -35,12 +37,13 @@ object Dependencies {
   val scalaCheckVersion = "1.14.3"
 
   val Versions = Seq(
-    crossScalaVersions := Seq(scala212Version, scala213Version),
+    crossScalaVersions := Seq(scala3Version, scala212Version, scala213Version),
     scalaVersion := System.getProperty("akka.build.scalaVersion", crossScalaVersions.value.head),
     java8CompatVersion := {
       CrossVersion.partialVersion(scalaVersion.value) match {
         // java8-compat is only used in a couple of places for 2.13,
         // it is probably possible to remove the dependency if needed.
+        case Some((0 | 3, _))        => "0.9.0"
         case Some((2, n)) if n >= 13 => "0.9.0"
         case _                       => "0.8.0"
       }
@@ -68,14 +71,14 @@ object Dependencies {
     val reactiveStreams = "org.reactivestreams" % "reactive-streams" % reactiveStreamsVersion // CC0
 
     // ssl-config
-    val sslConfigCore = Def.setting { "com.typesafe" %% "ssl-config-core" % sslConfigVersion } // ApacheV2
+    val sslConfigCore = Def.setting { "com.typesafe" %% "ssl-config-core" % sslConfigVersion withDottyCompat scalaVersion.value } // ApacheV2
 
     val lmdb = "org.lmdbjava" % "lmdbjava" % "0.7.0" // ApacheV2, OpenLDAP Public License
 
     val junit = "junit" % "junit" % junitVersion // Common Public License 1.0
 
     // For Java 8 Conversions
-    val java8Compat = Def.setting { "org.scala-lang.modules" %% "scala-java8-compat" % java8CompatVersion.value } // Scala License
+    val java8Compat = Def.setting { "org.scala-lang.modules" %% "scala-java8-compat" % java8CompatVersion.value withDottyCompat scalaVersion.value } // Scala License
 
     val aeronDriver = "io.aeron" % "aeron-driver" % aeronVersion // ApacheV2
     val aeronClient = "io.aeron" % "aeron-client" % aeronVersion // ApacheV2
@@ -96,7 +99,7 @@ object Dependencies {
     val logback = "ch.qos.logback" % "logback-classic" % logbackVersion // EPL 1.0
 
     object Docs {
-      val sprayJson = "io.spray" %% "spray-json" % "1.3.5" % "test"
+      val sprayJson = Def.setting { "io.spray" %% "spray-json" % "1.3.5" % "test" withDottyCompat scalaVersion.value }
       val gson = "com.google.code.gson" % "gson" % "2.8.6" % "test"
     }
 
@@ -113,10 +116,15 @@ object Dependencies {
       // The 'scalaTestPlus' projects are independently versioned,
       // but the version of each module starts with the scalatest
       // version it was intended to work with
-      val scalatestJUnit = "org.scalatestplus" %% "junit-4-12" % (scalaTestVersion + ".0") % "test" // ApacheV2
-      val scalatestTestNG = "org.scalatestplus" %% "testng-6-7" % (scalaTestVersion + ".0") % "test" // ApacheV2
-      val scalatestScalaCheck = "org.scalatestplus" %% "scalacheck-1-14" % (scalaTestVersion + ".0") % "test" // ApacheV2
-      val scalatestMockito = "org.scalatestplus" %% "mockito-3-2" % (scalaTestVersion + ".0") % "test" // ApacheV2
+      private def scalatestplus(name: String, patch: Int = 0) = Def.setting {
+        val sv = scalaVersion.value
+        val m = "org.scalatestplus" %% name % s"$scalaTestVersion.$patch" % "test"
+        m excludeAll ExclusionRule(scalatest.organization) withDottyCompat sv
+      }
+      val scalatestJUnit = scalatestplus("junit-4-12") // ApacheV2
+      val scalatestTestNG = scalatestplus("testng-6-7")// ApacheV2
+      val scalatestScalaCheck = scalatestplus("scalacheck-1-14", 1) // ApacheV2
+      val scalatestMockito = scalatestplus("mockito-3-2") // ApacheV2
 
       val pojosr = "com.googlecode.pojosr" % "de.kalpatec.pojosr.framework" % "0.2.1" % "test" // ApacheV2
       val tinybundles = "org.ops4j.pax.tinybundles" % "tinybundles" % "3.0.0" % "test" // ApacheV2
@@ -182,8 +190,8 @@ object Dependencies {
   val actorTests = l ++= Seq(
         Test.junit,
         Test.scalatest,
-        Test.scalatestJUnit,
-        Test.scalatestScalaCheck,
+        Test.scalatestJUnit.value,
+        Test.scalatestScalaCheck.value,
         Test.commonsCodec,
         Test.commonsMath,
         Test.scalacheck,
@@ -196,7 +204,7 @@ object Dependencies {
         Provided.logback,
         Provided.junit,
         Provided.scalatest,
-        Test.scalatestJUnit)
+        Test.scalatestJUnit.value)
 
   val remoteDependencies = Seq(netty, aeronDriver, aeronClient)
   val remoteOptionalDependencies = remoteDependencies.map(_ % "optional")
@@ -223,7 +231,7 @@ object Dependencies {
         Test.slf4jJul,
         Test.slf4jLog4j,
         Test.logback,
-        Test.scalatestMockito)
+        Test.scalatestMockito.value)
 
   val distributedData = l ++= Seq(lmdb, Test.junit, Test.scalatest)
 
@@ -233,7 +241,7 @@ object Dependencies {
         Provided.levelDB,
         Provided.levelDBNative,
         Test.scalatest,
-        Test.scalatestJUnit,
+        Test.scalatestJUnit.value,
         Test.junit,
         Test.commonsIo,
         Test.commonsCodec)
@@ -257,7 +265,7 @@ object Dependencies {
         jacksonCore,
         jacksonAnnotations,
         jacksonDatabind,
-        jacksonScala,
+        jacksonScala withDottyCompat scalaVersion.value,
         jacksonJdk8,
         jacksonJsr310,
         jacksonParameterNames,
@@ -275,7 +283,7 @@ object Dependencies {
         Test.scalatest,
         Test.junit)
 
-  val docs = l ++= Seq(Test.scalatest, Test.junit, Docs.sprayJson, Docs.gson, Provided.levelDB)
+  val docs = l ++= Seq(Test.scalatest, Test.junit, Docs.sprayJson.value, Docs.gson, Provided.levelDB)
 
   val benchJmh = l ++= Seq(Provided.levelDB, Provided.levelDBNative, Compile.jctools)
 
@@ -288,14 +296,14 @@ object Dependencies {
   lazy val streamTests = l ++= Seq(
         Test.scalatest,
         Test.scalacheck,
-        Test.scalatestScalaCheck,
+        Test.scalatestScalaCheck.value,
         Test.junit,
         Test.commonsIo,
         Test.jimfs)
 
   lazy val streamTestsTck = l ++= Seq(
         Test.scalatest,
-        Test.scalatestTestNG,
+        Test.scalatestTestNG.value,
         Test.scalacheck,
         Test.junit,
         Test.reactiveStreamsTck)
