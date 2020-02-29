@@ -7,6 +7,7 @@ package akka.io.dns.internal
 import java.net.{ Inet4Address, Inet6Address, InetAddress, InetSocketAddress }
 
 import akka.actor.{ Actor, ActorLogging, ActorRef, ActorRefFactory }
+import akka.actor.actorRef2Scala
 import akka.annotation.InternalApi
 import akka.io.SimpleDnsCache
 import akka.io.dns.CachePolicy.{ Never, Ttl }
@@ -19,7 +20,7 @@ import akka.util.{ Helpers, Timeout }
 import akka.util.PrettyDuration._
 
 import scala.collection.immutable
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContextExecutor, Future }
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -36,10 +37,10 @@ private[io] final class AsyncDnsResolver(
 
   import AsyncDnsResolver._
 
-  implicit val ec = context.dispatcher
+  implicit val ec: ExecutionContextExecutor = context.dispatcher
 
   // For ask to DNS Client
-  implicit val timeout = Timeout(settings.ResolveTimeout)
+  implicit val timeout: Timeout = Timeout(settings.ResolveTimeout)
 
   val nameServers = settings.NameServers
 

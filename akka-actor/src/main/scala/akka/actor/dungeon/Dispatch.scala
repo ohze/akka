@@ -23,7 +23,7 @@ import akka.serialization.Serialization
 import com.github.ghik.silencer.silent
 
 @SerialVersionUID(1L)
-final case class SerializationCheckFailedException private (msg: Object, cause: Throwable)
+final case class SerializationCheckFailedException private[dungeon] (msg: Object, cause: Throwable)
     extends AkkaException(
       s"Failed to serialize and deserialize message of type ${msg.getClass.getName} for testing. " +
       "To avoid this error, either disable 'akka.actor.serialize-messages', mark the message with 'akka.actor.NoSerializationVerificationNeeded', or configure serialization to support this message",
@@ -73,7 +73,7 @@ private[akka] trait Dispatch { this: ActorCell =>
      */
     // we need to delay the failure to the point of actor creation so we can handle
     // it properly in the normal way
-    val actorClass = props.actorClass
+    val actorClass = props.actorClass()
     val createMessage = mailboxType match {
       case _: ProducesMessageQueue[_] if system.mailboxes.hasRequiredType(actorClass) =>
         val req = system.mailboxes.getRequiredType(actorClass)

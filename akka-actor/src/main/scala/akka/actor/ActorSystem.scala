@@ -1037,7 +1037,7 @@ private[akka] class ActorSystemImpl(
     _initialized = true
 
     if (settings.LogDeadLetters > 0)
-      logDeadLetterListener = Some(systemActorOf(Props[DeadLetterListener], "deadLetterListener"))
+      logDeadLetterListener = Some(systemActorOf(Props[DeadLetterListener](), "deadLetterListener"))
     eventStream.startUnsubscriber()
     ManifestInfo(this).checkSameVersion("Akka", allModules, logWarning = true)
     if (!terminating)
@@ -1052,7 +1052,7 @@ private[akka] class ActorSystemImpl(
   }
 
   def start(): this.type = _start
-  def registerOnTermination[T](code: => T): Unit = { registerOnTermination(new Runnable { def run = code }) }
+  def registerOnTermination[T](code: => T): Unit = { registerOnTermination(new Runnable { def run() = code }) }
   def registerOnTermination(code: Runnable): Unit = { terminationCallbacks.add(code) }
 
   @volatile private var terminating = false

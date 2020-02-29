@@ -153,7 +153,8 @@ private[akka] trait FaultHandling { this: ActorCell =>
     if (systemImpl.aborting) {
       // separate iteration because this is a very rare case that should not penalize normal operation
       children.foreach {
-        case ref: ActorRefScope if !ref.isLocal => self.sendSystemMessage(DeathWatchNotification(ref, true, false))
+        // https://github.com/lampepfl/dotty/issues/8404
+        case ref: ActorRefScope if !ref.isLocal => self.sendSystemMessage(DeathWatchNotification(ref.asInstanceOf[ActorRef], true, false))
         case _                                  =>
       }
     }

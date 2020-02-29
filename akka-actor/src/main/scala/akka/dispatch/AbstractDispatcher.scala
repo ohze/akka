@@ -22,7 +22,7 @@ import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor }
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 import scala.util.control.NonFatal
 
-final case class Envelope private (val message: Any, val sender: ActorRef)
+final case class Envelope private[akka] (message: Any, sender: ActorRef)
 
 object Envelope {
   def apply(message: Any, sender: ActorRef, system: ActorSystem): Envelope = {
@@ -75,7 +75,7 @@ private[akka] object MessageDispatcher {
     if (debug) {
       for {
         d <- actors.keys
-        a <- { println(d + " inhabitants: " + d.inhabitants); actors.valueIterator(d) }
+        a <- { println(s"$d inhabitants: ${d.inhabitants}"); actors.valueIterator(d) }
       } {
         val status = if (a.isTerminated) " (terminated)" else " (alive)"
         val messages = a match {
