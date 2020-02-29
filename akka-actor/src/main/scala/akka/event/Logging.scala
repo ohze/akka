@@ -12,8 +12,7 @@ import akka.actor._
 import akka.annotation.{ DoNotInherit, InternalApi }
 import akka.dispatch.RequiresMessageQueue
 import akka.event.Logging._
-import akka.util.unused
-import akka.util.{ Helpers, ReentrantGuard }
+import akka.util.{ unused, Helpers, ReentrantGuard, Timeout }
 import akka.{ AkkaException, ConfigurationException }
 import com.github.ghik.silencer.silent
 
@@ -198,7 +197,7 @@ trait LoggingBus extends ActorEventBus {
       logName: String): ActorRef = {
     val name = "log" + LogExt(system).id() + "-" + simpleName(clazz)
     val actor = system.systemActorOf(Props(clazz).withDispatcher(system.settings.LoggersDispatcher), name)
-    implicit def timeout = system.settings.LoggerStartTimeout
+    implicit def timeout: Timeout = system.settings.LoggerStartTimeout
     import akka.pattern.ask
     val response = try Await.result(actor ? InitializeLogger(this), timeout.duration)
     catch {
@@ -340,7 +339,15 @@ object LogSource {
     override def genString(c: Class[_], system: ActorSystem): String = genString(c) + "(" + system + ")"
     override def getClazz(c: Class[_]): Class[_] = c
   }
-  implicit def fromAnyClass[T]: LogSource[Class[T]] = fromClass.asInstanceOf[LogSource[Class[T]]]
+
+  // dotty compile error if declare return type as `LogSource[Class[T]]`
+  // for example, in CoordinatedShutdown:
+  //  val log = Logging(system, getClass)
+  // => error:
+  //  Cannot find LogSource for Class[? <: akka.actor.CoordinatedShutdown]
+  //  I found: akka.event.LogSource.fromAnyClass[Nothing]
+  //  But method fromAnyClass in object LogSource does not match type akka.event.LogSource[Class[? <: akka.actor.CoordinatedShutdown]].
+  implicit def fromAnyClass[T]: LogSource[Class[_ <: T]] = fromClass.asInstanceOf[LogSource[Class[_ <: T]]]
 
   /**
    * Convenience converter access: given an implicit `LogSource`, generate the

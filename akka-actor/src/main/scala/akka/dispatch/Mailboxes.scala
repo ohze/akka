@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 import akka.ConfigurationException
 import akka.actor.{ Actor, ActorRef, ActorSystem, DeadLetter, Deploy, DynamicAccess, Props }
+import akka.actor.actorRef2Scala
 import akka.dispatch.sysmsg.{
   EarliestFirstSystemMessageList,
   LatestFirstSystemMessageList,
@@ -139,7 +140,7 @@ private[akka] class Mailboxes(
   protected[akka] def getMailboxType(props: Props, dispatcherConfig: Config): MailboxType = {
     val id = dispatcherConfig.getString("id")
     val deploy = props.deploy
-    val actorClass = props.actorClass
+    val actorClass = props.actorClass()
     lazy val actorRequirement = getRequiredType(actorClass)
 
     val mailboxRequirement: Class[_] = getMailboxRequirement(dispatcherConfig)

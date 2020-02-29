@@ -9,8 +9,7 @@ import scala.util.{ Failure, Success, Try }
 import scala.collection.immutable
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.ClassTag
-import scala.concurrent.{ Await, Future }
-
+import scala.concurrent.{ Await, ExecutionContextExecutor, Future }
 import akka.japi.{ Creator, Option => JOption }
 import akka.japi.Util.{ immutableSeq, immutableSingletonSeq }
 import akka.pattern.AskTimeoutException
@@ -47,7 +46,7 @@ trait TypedActorFactory {
    */
   def stop(proxy: AnyRef): Boolean = getActorRefFor(proxy) match {
     case null => false
-    case ref  => ref.asInstanceOf[InternalActorRef].stop; true
+    case ref  => ref.asInstanceOf[InternalActorRef].stop(); true
   }
 
   /**
@@ -76,7 +75,7 @@ trait TypedActorFactory {
     val proxyVar = new AtomVar[R] //Chicken'n'egg-resolver
     val c = props.creator //Cache this to avoid closing over the Props
     val i = props.interfaces //Cache this to avoid closing over the Props
-    val ap = Props(new TypedActor.TypedActor[R, T](proxyVar, c(), i)).withDeploy(props.actorProps.deploy)
+    val ap = Props(new TypedActor.TypedActor[R, T](proxyVar, c(), i)).withDeploy(props.actorProps().deploy)
     typedActor.createActorRefProxy(props, proxyVar, actorFactory.actorOf(ap))
   }
 
@@ -87,7 +86,7 @@ trait TypedActorFactory {
     val proxyVar = new AtomVar[R] //Chicken'n'egg-resolver
     val c = props.creator //Cache this to avoid closing over the Props
     val i = props.interfaces //Cache this to avoid closing over the Props
-    val ap = Props(new akka.actor.TypedActor.TypedActor[R, T](proxyVar, c(), i)).withDeploy(props.actorProps.deploy)
+    val ap = Props(new akka.actor.TypedActor.TypedActor[R, T](proxyVar, c(), i)).withDeploy(props.actorProps().deploy)
     typedActor.createActorRefProxy(props, proxyVar, actorFactory.actorOf(ap, name))
   }
 
@@ -252,7 +251,7 @@ object TypedActor extends ExtensionId[TypedActorExtension] with ExtensionIdProvi
   /**
    * Returns the default dispatcher (for a TypedActor) when inside a method call in a TypedActor.
    */
-  implicit def dispatcher = context.dispatcher
+  implicit def dispatcher: ExecutionContextExecutor = context.dispatcher
 
   /**
    * INTERNAL API
@@ -271,7 +270,7 @@ object TypedActor extends ExtensionId[TypedActorExtension] with ExtensionIdProvi
     private val me = withContext[T](createInstance)
 
     override def supervisorStrategy: SupervisorStrategy = me match {
-      case l: Supervisor => l.supervisorStrategy
+      case l: Supervisor => l.supervisorStrategy()
       case _             => super.supervisorStrategy
     }
 

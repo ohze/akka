@@ -5,6 +5,7 @@
 package akka.event
 
 import akka.actor.{ ActorRef, ActorSystem }
+import akka.actor.actorRef2Scala
 import akka.util.Index
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.Comparator
@@ -263,6 +264,16 @@ trait ScanningClassification { self: EventBus =>
  */
 trait ManagedActorClassification { this: ActorEventBus with ActorClassifier =>
   import scala.annotation.tailrec
+
+  // re-define here to fix dotty (0.22.0-RC1) compile error in ActorClassificationUnsubscriber.receive:
+  //[error] 61 |      bus.unsubscribe(actor)
+  //[error]    |      ^
+  //[error]    |cannot resolve reference to type (ActorClassificationUnsubscriber.this.bus :
+  //[error]    |  akka.event.ManagedActorClassification
+  //[error]    |).Subscriber
+  //[error]    |the classfile defining the type might be missing from the classpath
+  type Subscriber = ActorRef
+  type Classifier = ActorRef
 
   protected def system: ActorSystem
 
