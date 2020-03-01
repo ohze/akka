@@ -6,12 +6,15 @@ package akka.dispatch
 
 import akka.actor.ActorCell
 import akka.dispatch.sysmsg._
+
 import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import akka.util.Helpers
-import java.util.{ Comparator, Iterator }
+import java.util.{Comparator, Iterator}
 import java.util.concurrent.ConcurrentSkipListSet
+
 import akka.actor.ActorSystemImpl
+
 import scala.concurrent.duration.FiniteDuration
 
 /**
@@ -61,25 +64,9 @@ private[akka] class BalancingDispatcher(
    */
   private[akka] val messageQueue: MessageQueue = _mailboxType.create(None, None)
 
-  private class SharingMailbox(val system: ActorSystemImpl, _messageQueue: MessageQueue)
-      extends Mailbox(_messageQueue)
-      with DefaultSystemMessageQueue {
-    override def cleanUp(): Unit = {
-      val dlq = mailboxes.deadLetterMailbox
-      //Don't call the original implementation of this since it scraps all messages, and we don't want to do that
-      var messages = systemDrain(new LatestFirstSystemMessageList(NoMessage))
-      while (messages.nonEmpty) {
-        // message must be “virgin” before being able to systemEnqueue again
-        val message = messages.head
-        messages = messages.tail
-        message.unlink()
-        dlq.systemEnqueue(system.deadLetters, message)
-      }
-    }
-  }
-
+  import BalancingDispatcher.SharingMailbox
   protected[akka] override def createMailbox(actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox =
-    new SharingMailbox(actor.systemImpl, messageQueue)
+    new SharingMailbox(actor.systemImpl, messageQueue, mailboxes)
 
   protected[akka] override def register(actor: ActorCell): Unit = {
     super.register(actor)
@@ -111,4 +98,23 @@ private[akka] class BalancingDispatcher(
 
       scheduleOne()
     }
+}
+
+object BalancingDispatcher {
+  private class SharingMailbox(val system: ActorSystemImpl, _messageQueue: MessageQueue, mailboxes: Mailboxes)
+    extends Mailbox(_messageQueue)
+      with DefaultSystemMessageQueue {
+    override def cleanUp(): Unit = {
+      val dlq = mailboxes.deadLetterMailbox
+      //Don't call the original implementation of this since it scraps all messages, and we don't want to do that
+      var messages = systemDrain(new LatestFirstSystemMessageList(NoMessage))
+      while (messages.nonEmpty) {
+        // message must be “virgin” before being able to systemEnqueue again
+        val message = messages.head
+        messages = messages.tail
+        message.unlink()
+        dlq.systemEnqueue(system.deadLetters, message)
+      }
+    }
+  }
 }
