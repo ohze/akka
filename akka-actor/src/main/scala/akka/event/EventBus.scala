@@ -262,18 +262,18 @@ trait ScanningClassification { self: EventBus =>
  * All subscribers will be watched by an `akka.event.ActorClassificationUnsubscriber` and unsubscribed when they terminate.
  * The unsubscriber actor will not be stopped automatically, and if you want to stop using the bus you should stop it yourself.
  */
-trait ManagedActorClassification { this: ActorEventBus with ActorClassifier =>
+// `extends ActorEventBus with ActorClassifier` instead of self type -
+// to fix dotty (0.22.0-RC1) compile error in ActorClassificationUnsubscriber.receive:
+//[error] 61 |      bus.unsubscribe(actor)
+//[error]    |      ^
+//[error]    |cannot resolve reference to type (ActorClassificationUnsubscriber.this.bus :
+//[error]    |  akka.event.ManagedActorClassification
+//[error]    |).Subscriber
+//[error]    |the classfile defining the type might be missing from the classpath
+// See also: https://gitter.im/lampepfl/dotty?at=5e5aca5eec7f8746aaa548df
+trait ManagedActorClassification extends ActorEventBus with ActorClassifier {
+// trait ManagedActorClassification { this: ActorEventBus with ActorClassifier =>
   import scala.annotation.tailrec
-
-  // re-define here to fix dotty (0.22.0-RC1) compile error in ActorClassificationUnsubscriber.receive:
-  //[error] 61 |      bus.unsubscribe(actor)
-  //[error]    |      ^
-  //[error]    |cannot resolve reference to type (ActorClassificationUnsubscriber.this.bus :
-  //[error]    |  akka.event.ManagedActorClassification
-  //[error]    |).Subscriber
-  //[error]    |the classfile defining the type might be missing from the classpath
-  type Subscriber = ActorRef
-  type Classifier = ActorRef
 
   protected def system: ActorSystem
 
