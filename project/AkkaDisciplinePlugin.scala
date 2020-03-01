@@ -73,10 +73,12 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
     if (enabled) {
       scalaFixSettings ++
       silencerSettings ++ Seq(
+        /* TODO re-enable -Xfatal-warnings
         Compile / scalacOptions ++= (
             if (!nonFatalWarningsFor(name.value)) Seq("-Xfatal-warnings")
             else Seq.empty
           ),
+        */
         Test / scalacOptions --= testUndicipline,
         Compile / scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
             case Some((2, 13)) =>
