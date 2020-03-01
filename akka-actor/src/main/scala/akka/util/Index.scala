@@ -20,11 +20,8 @@ import com.github.ghik.silencer.silent
  * Reads are fully concurrent &lt;-- el-cheapo
  */
 class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
-
   def this(mapSize: Int, cmp: (V, V) => Int) =
-    this(mapSize, new Comparator[V] {
-      def compare(a: V, b: V): Int = cmp(a, b)
-    })
+    this(mapSize, ((a: V, b: V) => cmp(a, b)): Comparator[V])
 
   private val container = new ConcurrentHashMap[K, ConcurrentSkipListSet[V]](mapSize)
   private val emptySet = new ConcurrentSkipListSet[V]

@@ -82,7 +82,7 @@ private[akka] class CachingConfig(_config: Config) extends Config {
 
   def origin() = config.origin()
 
-  def withFallback(other: ConfigMergeable) = new CachingConfig(config.withFallback(other))
+  override def withFallback(other: ConfigMergeable) = new CachingConfig(config.withFallback(other))
 
   def resolve() = resolve(ConfigResolveOptions.defaults())
 
