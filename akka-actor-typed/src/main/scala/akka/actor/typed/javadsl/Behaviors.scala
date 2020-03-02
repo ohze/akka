@@ -301,8 +301,11 @@ object Behaviors {
   def transformMessages[Outer, Inner](
       interceptMessageClass: Class[Outer],
       behavior: Behavior[Inner],
-      selector: JFunction[PFBuilder[Outer, Inner], PFBuilder[Outer, Inner]]): Behavior[Outer] =
-    BehaviorImpl.transformMessages(behavior, selector.apply(new PFBuilder).build())(ClassTag(interceptMessageClass))
+      selector: JFunction[PFBuilder[Outer, Inner], PFBuilder[Outer, Inner]]): Behavior[Outer] = {
+    // https://gitter.im/lampepfl/dotty?at=5e5cc5ab2e398f46abd536c3
+    val matcher = selector.apply(new PFBuilder).build().asInstanceOf[PartialFunction[Outer, Inner]]
+    BehaviorImpl.transformMessages(behavior, matcher)(ClassTag(interceptMessageClass))
+  }
 
   /**
    * Support for scheduled `self` messages in an actor.
