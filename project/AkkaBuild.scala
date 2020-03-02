@@ -110,8 +110,11 @@ object AkkaBuild {
     scalacOptions in Compile ++= (if (allWarnings) Seq("-deprecation") else Nil),
     Compile / scalacOptions := {
       val options = (Compile / scalacOptions).value
-      if (isDotty.value) options.filterNot(_ == "-Xlog-reflective-calls")
+      if (!isDotty.value) options
       else options
+        .filterNot(x =>
+          x == "-Xlog-reflective-calls" || x.startsWith("-language:")
+        ) :+ "-language:higherKinds,implicitConversions" // TODO remove -language:implicitConversions
     },
     scalacOptions in Test := (scalacOptions in Test).value.filterNot(opt =>
       opt == "-Xlog-reflective-calls" || opt.contains("genjavadoc")),
