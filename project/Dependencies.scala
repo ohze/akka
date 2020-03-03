@@ -27,7 +27,9 @@ object Dependencies {
   val protobufJavaVersion = "3.10.0"
   val logbackVersion = "1.2.3"
 
-  val scala3Version = "0.22.0-RC1"
+  // akka-testkit / compile fail on 0.22.0-RC1
+  // https://github.com/lampepfl/dotty/issues/8151
+  val scala3Version = "0.23.0-bin-20200301-d989caf-NIGHTLY" // dottyLatestNightlyBuild.get
   val scala212Version = "2.12.10"
   val scala213Version = "2.13.1"
 
@@ -39,7 +41,7 @@ object Dependencies {
     crossScalaVersions := Seq(scala3Version, scala212Version, scala213Version),
     scalaVersion := System.getProperty("akka.build.scalaVersion", crossScalaVersions.value.head),
     scalaCheckVersion := sys.props.get("akka.build.scalaCheckVersion").getOrElse("1.14.3"),
-    scalaTestVersion := "3.1.1",
+    scalaTestVersion := "3.1.1-SNAPSHOT",
     java8CompatVersion := {
       CrossVersion.partialVersion(scalaVersion.value) match {
         // java8-compat is only used in a couple of places for 2.13,
@@ -105,7 +107,7 @@ object Dependencies {
 
     object Test {
       private def scalatestplus(name: String, patch: Int = 0) = Def.setting {
-        val v = scalaTestVersion.value
+        val v = scalaTestVersion.value.stripSuffix("-SNAPSHOT")
         val sv = scalaVersion.value
         val m = "org.scalatestplus" %% name % s"$v.$patch" % "test"
         m excludeAll ExclusionRule(scalatest.value.organization) withDottyCompat sv

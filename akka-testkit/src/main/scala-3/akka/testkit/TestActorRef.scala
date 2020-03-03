@@ -22,13 +22,13 @@ import com.github.ghik.silencer.silent
  * @since 1.1
  */
 @silent // 'early initializers' are deprecated on 2.13 and will be replaced with trait parameters on 2.14. https://github.com/akka/akka/issues/26753
-class TestActorRef[T <: Actor](_system: ActorSystem, _props: Props, _supervisor: ActorRef, name: String) extends {
-  val props =
+class TestActorRef[T <: Actor](_system: ActorSystem, _props: Props, _supervisor: ActorRef, name: String)(using
+  val props: Props =
     _props.withDispatcher(
-      if (_props.deploy.dispatcher == Deploy.NoDispatcherGiven) CallingThreadDispatcher.Id
-      else _props.dispatcher)
-  val dispatcher = _system.dispatchers.lookup(props.dispatcher)
-  private val disregard = _supervisor match {
+      if (_props.deploy.dispatcher == Deploy.NoDispatcherGiven) _props.dispatcher//CallingThreadDispatcher.Id
+      else _props.dispatcher))(using
+  val dispatcher: MessageDispatcher = _system.dispatchers.lookup(props.dispatcher),
+  disregard: Any = _supervisor match {
     case l: LocalActorRef => l.underlying.reserveChild(name)
     case r: RepointableActorRef =>
       r.underlying match {
@@ -48,7 +48,7 @@ class TestActorRef[T <: Actor](_system: ActorSystem, _props: Props, _supervisor:
         name,
         s.getClass)
   }
-} with LocalActorRef(
+  ) extends LocalActorRef(
   _system.asInstanceOf[ActorSystemImpl],
   props,
   dispatcher,
