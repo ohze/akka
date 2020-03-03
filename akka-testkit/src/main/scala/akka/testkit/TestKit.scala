@@ -1033,7 +1033,7 @@ object TestProbe {
 }
 
 trait ImplicitSender { this: TestKitBase =>
-  implicit def self = testActor
+  implicit def self: ActorRef = testActor
 }
 
 trait DefaultTimeout { this: TestKitBase =>

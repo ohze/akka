@@ -45,7 +45,7 @@ object AkkaSpec {
 
   def mapToConfig(map: Map[String, Any]): Config = {
     import akka.util.ccompat.JavaConverters._
-    ConfigFactory.parseMap(map.asJava)
+    ConfigFactory.parseMap(map.asInstanceOf[Map[String, AnyRef]].asJava)
   }
 
   def testNameFromCallStack(classToStartFrom: Class[_]): String = {
@@ -100,7 +100,7 @@ abstract class AkkaSpec(_system: ActorSystem)
     with TypeCheckedTripleEquals
     with ScalaFutures {
 
-  implicit val patience = PatienceConfig(testKitSettings.DefaultTimeout.duration, Span(100, Millis))
+  implicit val patience: PatienceConfig = PatienceConfig(testKitSettings.DefaultTimeout.duration, Span(100, Millis))
 
   def this(config: Config) =
     this(
@@ -118,12 +118,12 @@ abstract class AkkaSpec(_system: ActorSystem)
 
   override val invokeBeforeAllAndAfterAllEvenIfNoTestsAreExpected = true
 
-  final override def beforeAll: Unit = {
+  final override def beforeAll(): Unit = {
     startCoroner()
     atStartup()
   }
 
-  final override def afterAll: Unit = {
+  final override def afterAll(): Unit = {
     beforeTermination()
     shutdown()
     afterTermination()
