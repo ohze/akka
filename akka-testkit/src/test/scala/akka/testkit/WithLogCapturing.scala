@@ -50,10 +50,12 @@ trait WithLogCapturing extends SuiteMixin { this: TestSuite =>
   /** Adds a prefix to every line printed out during execution of the thunk. */
   private def withPrefixedOut[T](prefix: String)(thunk: => T): T = {
     val oldOut = Console.out
+    // https://github.com/lampepfl/dotty/issues/8425
+    val os = new OutputStream {
+      override def write(b: Int): Unit = oldOut.write(b)
+    }
     val prefixingOut =
-      new PrintStream(new OutputStream {
-        override def write(b: Int): Unit = oldOut.write(b)
-      }) {
+      new PrintStream(os) {
         override def println(x: Any): Unit =
           oldOut.println(prefix + String.valueOf(x).replaceAllLiterally("\n", s"\n$prefix"))
       }
