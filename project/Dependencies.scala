@@ -25,7 +25,9 @@ object Dependencies {
   val protobufJavaVersion = "3.10.0"
   val logbackVersion = "1.2.3"
 
-  val scala3Version = "0.22.0-RC1"
+  // akka-testkit / compile fail on 0.22.0-RC1
+  // https://github.com/lampepfl/dotty/issues/8151
+  val scala3Version = "0.23.0-bin-20200301-d989caf-NIGHTLY" // dottyLatestNightlyBuild.get
   val scala212Version = "2.12.10"
   val scala213Version = "2.13.1"
 
@@ -33,7 +35,7 @@ object Dependencies {
 
   val sslConfigVersion = "0.4.1"
 
-  val scalaTestVersion = "3.1.1"
+  val scalaTestVersion = "3.1.1-SNAPSHOT"
   val scalaCheckVersion = "1.14.3"
 
   val Versions = Seq(
@@ -117,8 +119,9 @@ object Dependencies {
       // but the version of each module starts with the scalatest
       // version it was intended to work with
       private def scalatestplus(name: String, patch: Int = 0) = Def.setting {
+        val v = scalaTestVersion.stripSuffix("-SNAPSHOT")
         val sv = scalaVersion.value
-        val m = "org.scalatestplus" %% name % s"$scalaTestVersion.$patch" % "test"
+        val m = "org.scalatestplus" %% name % s"$v.$patch" % "test"
         m excludeAll ExclusionRule(scalatest.organization) withDottyCompat sv
       }
       val scalatestJUnit = scalatestplus("junit-4-12") // ApacheV2
