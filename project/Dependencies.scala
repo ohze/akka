@@ -27,7 +27,8 @@ object Dependencies {
 
   // akka-testkit / compile fail on 0.22.0-RC1
   // https://github.com/lampepfl/dotty/issues/8151
-  val scala3Version = "0.23.0-bin-20200301-d989caf-NIGHTLY" // dottyLatestNightlyBuild.get
+  // TODO change
+  val scala3Version = "0.23.0-bin-SNAPSHOT" // "0.23.0-bin-20200301-d989caf-NIGHTLY" // dottyLatestNightlyBuild.get
   val scala212Version = "2.12.10"
   val scala213Version = "2.13.1"
 

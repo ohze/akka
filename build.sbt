@@ -1,5 +1,7 @@
 import akka.{ AutomaticModuleName, CopyrightHeaderForBuild, Paradox, ParadoxSupport, ScalafixIgnoreFilePlugin }
 
+ThisBuild / updateOptions := updateOptions.value.withLatestSnapshots(false) // TODO remove
+
 enablePlugins(
   UnidocRoot,
   UnidocWithPrValidation,
