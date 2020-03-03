@@ -45,20 +45,21 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
     "akka-stream-tests-tck",
     "akka-testkit")
 
-  private val isDotty022 = Def.setting {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((0, 22)) => true
-      case Some((0, _)) => ???
-      case _ => false
+  implicit class DottyCompatModuleID(moduleID: ModuleID) {
+    def withDottyFullCompat(scalaVersion: String): ModuleID = {
+      CrossVersion.partialVersion(scalaVersion) match {
+        case Some((0, 22 | 23)) => moduleID.cross(CrossVersion.constant("2.13.1"))
+        case Some((0, _)) => ??? // TODO
+        case _ => moduleID.cross(CrossVersion.patch)
+      }
     }
   }
-  lazy val scalaFixSettings = Seq(Compile / scalacOptions ++= (if (isDotty022.value) Nil else Seq("-Yrangepos")))
+  private def isDotty(scalaVersion: String) = scalaVersion.startsWith("0.") || scalaVersion.startsWith("3.")
+  lazy val scalaFixSettings = Seq(Compile / scalacOptions ++= (if (isDotty(scalaVersion.value)) Nil else Seq("-Yrangepos")))
 
   private def silencer(n: String) = Def.setting {
     val silencerVersion = "1.6.0"
-    val m = "com.github.ghik" %% s"silencer-$n" % silencerVersion
-    if (isDotty022.value) m.cross(CrossVersion.constant("2.13.1"))
-    else m.cross(CrossVersion.patch)
+    "com.github.ghik" %% s"silencer-$n" % silencerVersion withDottyFullCompat scalaVersion.value
   }
 
   lazy val silencerSettings = Seq(
