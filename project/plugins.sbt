@@ -27,3 +27,4 @@ addSbtPlugin("net.bzzt" % "sbt-reproducible-builds" % "0.23")
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.0.0")
 
 addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.4.0")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "2.0.0-RC6-1")
