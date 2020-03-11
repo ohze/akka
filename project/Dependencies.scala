@@ -36,7 +36,7 @@ object Dependencies {
 
   val sslConfigVersion = "0.4.1"
 
-  val scalaTestVersion = Def.setting { "3.2.0-M4" + (if (scalaVersion.value.startsWith("0.23")) "-SNAPSHOT" else "") }
+  val scalaTestVersion = Def.setting { "3.1.1" + (if (scalaVersion.value.startsWith("0.23")) "-SNAPSHOT" else "") }
   val scalaCheckVersion = "1.14.3"
 
   val Versions = Seq(
