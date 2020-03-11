@@ -195,7 +195,7 @@ final class ActorTestKit private[akka] (val name: String, val config: Config, se
    */
   def stop[T](ref: ActorRef[T], max: FiniteDuration = timeout.duration): Unit =
     try {
-      Await.result(internalSystem.ask { x: ActorRef[ActorTestKitGuardian.Ack.type] =>
+      Await.result(internalSystem.ask { (x: ActorRef[ActorTestKitGuardian.Ack.type]) =>
         ActorTestKitGuardian.StopActor(ref, x)
       }, max)
     } catch {

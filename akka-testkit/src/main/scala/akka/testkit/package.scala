@@ -57,4 +57,8 @@ package object testkit {
       Duration.fromNanos((duration.toNanos * TestKitExtension(system).TestTimeFactor + 0.5).toLong)
   }
 
+  import akka.event.LogSource
+  given [T] as LogSource[Class[_ <: T]] = LogSource.fromClass.asInstanceOf[LogSource[Class[_ <: T]]]
+  //  implicit def fromAnyClass[T]: LogSource[Class[_ <: T]] = fromClass.asInstanceOf[LogSource[Class[_ <: T]]]
+
 }
