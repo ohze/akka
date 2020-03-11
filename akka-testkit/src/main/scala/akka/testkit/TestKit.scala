@@ -158,7 +158,7 @@ trait TestKitBase {
 
   import TestActor.{ Message, NullMessage, RealMessage, Spawn }
 
-  implicit val system: ActorSystem
+  implicit def system: ActorSystem
   val testKitSettings = TestKitExtension(system)
 
   private val queue = new LinkedBlockingDeque[Message]()
@@ -925,9 +925,8 @@ trait TestKitBase {
  *
  * @since 1.1
  */
-private trait TestKitEarlyInit(implicit val system: ActorSystem)
 
-class TestKit(_system: ActorSystem) extends TestKitEarlyInit(using _system) with TestKitBase
+class TestKit(_system: ActorSystem) extends ScalaVersionSpecificTestkit(_system)
 
 object TestKit {
 
