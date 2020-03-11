@@ -28,7 +28,7 @@ object Dependencies {
   // akka-testkit / compile fail on 0.22.0-RC1
   // https://github.com/lampepfl/dotty/issues/8151
   // TODO change
-  val scala3Version = "0.23.0-bin-20200306-d401b16-SNAPSHOT" // "0.23.0-bin-20200301-d989caf-NIGHTLY" // dottyLatestNightlyBuild.get
+  val scala3Version = "0.23.0-bin-20200305-84f2e41-NIGHTLY" // dottyLatestNightlyBuild.get
   val scala212Version = "2.12.10"
   val scala213Version = "2.13.1"
 
@@ -36,11 +36,11 @@ object Dependencies {
 
   val sslConfigVersion = "0.4.1"
 
-  val scalaTestVersion = Def.setting { if (scalaVersion.value.startsWith("0.23")) "3.1.1-SNAPSHOT" else "3.1.1" }
+  val scalaTestVersion = Def.setting { "3.2.0-M4" + (if (scalaVersion.value.startsWith("0.23")) "-SNAPSHOT" else "") }
   val scalaCheckVersion = "1.14.3"
 
   val Versions = Seq(
-    crossScalaVersions := Seq(scala3Version, scala212Version, scala213Version),
+    crossScalaVersions := Seq(scala3Version, "0.22.0-RC1", scala212Version, scala213Version),
     scalaVersion := System.getProperty("akka.build.scalaVersion", crossScalaVersions.value.head),
     java8CompatVersion := {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -119,15 +119,18 @@ object Dependencies {
       // The 'scalaTestPlus' projects are independently versioned,
       // but the version of each module starts with the scalatest
       // version it was intended to work with
+      private val scalatestVersionRegex = "([0-9.]+)(-\\w+)?".r // ex: 3.2.0-M4
       private def scalatestplus(name: String, patch: Int = 0) = Def.setting {
-        val v = scalaTestVersion.value.stripSuffix("-SNAPSHOT")
+        val v = scalaTestVersion.value.stripSuffix("-SNAPSHOT") match {
+          case scalatestVersionRegex(v, suffix) => s"$v.$patch" + Option(suffix).getOrElse("")
+        }
         val sv = scalaVersion.value
-        val m = "org.scalatestplus" %% name % s"$v.$patch" % "test"
+        val m = "org.scalatestplus" %% name % v % "test"
         m excludeAll ExclusionRule(scalatest.value.organization) withDottyCompat sv
       }
       val scalatestJUnit = scalatestplus("junit-4-12") // ApacheV2
       val scalatestTestNG = scalatestplus("testng-6-7")// ApacheV2
-      val scalatestScalaCheck = scalatestplus("scalacheck-1-14", 1) // ApacheV2
+      val scalatestScalaCheck = scalatestplus("scalacheck-1-14") // ApacheV2
       val scalatestMockito = scalatestplus("mockito-3-2") // ApacheV2
 
       val pojosr = "com.googlecode.pojosr" % "de.kalpatec.pojosr.framework" % "0.2.1" % "test" // ApacheV2
