@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import org.scalatest.concurrent.Eventually
 
+import scala.reflect.ClassTag
+
 class TestProbeSpec extends AkkaSpec with DefaultTimeout with Eventually {
 
   "A TestProbe" must {
@@ -141,7 +143,8 @@ class TestProbeSpec extends AkkaSpec with DefaultTimeout with Eventually {
 
     "be able to expect primitive types" in {
       for (_ <- 1 to 7) testActor ! 42
-      expectMsgType[Int] should ===(42)
+      // https://github.com/lampepfl/dotty/issues/8581
+      expectMsgType[Int](implicitly[ClassTag[Int]]) should ===(42)
       expectMsgAnyClassOf(classOf[Int]) should ===(42)
       expectMsgAllClassOf(classOf[Int]) should ===(Seq(42))
       expectMsgAllConformingOf(classOf[Int]) should ===(Seq(42))
