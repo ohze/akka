@@ -21,12 +21,12 @@ object Dependencies {
   // https://github.com/real-logic/aeron/blob/1.x.y/build.gradle
   val agronaVersion = "1.4.0"
   val nettyVersion = "3.10.6.Final"
-  val jacksonVersion = "2.10.2"
+  val jacksonVersion = "2.10.3"
   val protobufJavaVersion = "3.10.0"
   val logbackVersion = "1.2.3"
 
   val scala3Version = "0.23.0-RC1"
-  val scala212Version = "2.12.10"
+  val scala212Version = "2.12.11"
   val scala213Version = "2.13.1"
 
   val reactiveStreamsVersion = "1.0.3"
@@ -146,8 +146,8 @@ object Dependencies {
       val dockerClient = "com.spotify" % "docker-client" % "8.16.0" % "test" // ApacheV2
 
       // metrics, measurements, perf testing
-      val metrics = "io.dropwizard.metrics" % "metrics-core" % "4.1.4" % "test" // ApacheV2
-      val metricsJvm = "io.dropwizard.metrics" % "metrics-jvm" % "4.1.4" % "test" // ApacheV2
+      val metrics = "io.dropwizard.metrics" % "metrics-core" % "4.1.5" % "test" // ApacheV2
+      val metricsJvm = "io.dropwizard.metrics" % "metrics-jvm" % "4.1.5" % "test" // ApacheV2
       val latencyUtils = "org.latencyutils" % "LatencyUtils" % "2.0.3" % "test" // Free BSD
       val hdrHistogram = "org.hdrhistogram" % "HdrHistogram" % "2.1.12" % "test" // CC0
       val metricsAll = Seq(metrics, metricsJvm, latencyUtils, hdrHistogram)
@@ -267,6 +267,8 @@ object Dependencies {
         Test.junit.withConfigurations(Some("compile")),
         Provided.levelDB,
         Provided.levelDBNative)
+
+  val persistenceTestKit = l ++= Seq(Test.scalatest.value)
 
   val persistenceShared = l ++= Seq(Provided.levelDB, Provided.levelDBNative)
 

@@ -46,9 +46,6 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
     "akka-testkit")
 
   private val isDotty = Def.setting { scalaVersion.value.startsWith("0.") || scalaVersion.value.startsWith("3.") }
-  lazy val scalaFixSettings = Seq(
-    Compile / scalacOptions ++= (if(isDotty.value) Nil else Seq("-Yrangepos"))
-  )
 
   implicit class DottyCompatModuleID(val moduleID: ModuleID) extends AnyVal {
     def withDottyFullCompat(scalaVersion: String): ModuleID = {
@@ -75,7 +72,6 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
 
   lazy val disciplineSettings =
     if (enabled) {
-      scalaFixSettings ++
       silencerSettings ++ Seq(
         Compile / scalacOptions ++= (
             if (!nonFatalWarningsFor(name.value) && !isDotty.value) Seq("-Xfatal-warnings")
