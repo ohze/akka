@@ -45,17 +45,20 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
     "akka-stream-tests-tck",
     "akka-testkit")
 
-  implicit class DottyCompatModuleID(moduleID: ModuleID) {
+  private val isDotty = Def.setting { scalaVersion.value.startsWith("0.") || scalaVersion.value.startsWith("3.") }
+  lazy val scalaFixSettings = Seq(
+    Compile / scalacOptions ++= (if(isDotty.value) Nil else Seq("-Yrangepos"))
+  )
+
+  implicit class DottyCompatModuleID(val moduleID: ModuleID) extends AnyVal {
     def withDottyFullCompat(scalaVersion: String): ModuleID = {
       CrossVersion.partialVersion(scalaVersion) match {
-        case Some((0, 22 | 23)) => moduleID.cross(CrossVersion.constant("2.13.1"))
-        case Some((0, _)) => ??? // TODO
-        case _ => moduleID.cross(CrossVersion.patch)
+        case Some((0, 22 | 23)) => moduleID cross CrossVersion.constant("2.13.1")
+        case Some((0 | 3, _)) => ??? // TODO
+        case _ => moduleID cross CrossVersion.patch
       }
     }
   }
-  private def isDotty(scalaVersion: String) = scalaVersion.startsWith("0.") || scalaVersion.startsWith("3.")
-  lazy val scalaFixSettings = Seq(Compile / scalacOptions ++= (if (isDotty(scalaVersion.value)) Nil else Seq("-Yrangepos")))
 
   private def silencer(n: String) = Def.setting {
     val silencerVersion = "1.6.0"
@@ -65,7 +68,7 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
   lazy val silencerSettings = Seq(
     libraryDependencies += silencer("lib").value % Provided,
     libraryDependencies ++= (
-      if(!scalaVersion.value.startsWith("2.")) Nil
+      if(isDotty.value) Nil
       else Seq(compilerPlugin(silencer("plugin").value))
     )
   )
@@ -74,12 +77,10 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
     if (enabled) {
       scalaFixSettings ++
       silencerSettings ++ Seq(
-        /* TODO re-enable -Xfatal-warnings
         Compile / scalacOptions ++= (
-            if (!nonFatalWarningsFor(name.value)) Seq("-Xfatal-warnings")
+            if (!nonFatalWarningsFor(name.value) && !isDotty.value) Seq("-Xfatal-warnings")
             else Seq.empty
           ),
-        */
         Test / scalacOptions --= testUndicipline,
         Compile / scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
             case Some((2, 13)) =>

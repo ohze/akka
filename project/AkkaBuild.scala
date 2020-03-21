@@ -114,7 +114,7 @@ object AkkaBuild {
       else options
         .filterNot(x =>
           x == "-Xlog-reflective-calls" || x.startsWith("-language:")
-        ) :+ "-language:higherKinds,implicitConversions" // TODO remove -language:implicitConversions
+        ) :+ "-language:higherKinds,implicitConversions"
     },
     scalacOptions in Test := (scalacOptions in Test).value.filterNot(opt =>
       opt == "-Xlog-reflective-calls" || opt.contains("genjavadoc")),

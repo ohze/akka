@@ -1,7 +1,5 @@
 import akka.{ AutomaticModuleName, CopyrightHeaderForBuild, Paradox, ParadoxSupport, ScalafixIgnoreFilePlugin }
 
-ThisBuild / updateOptions := updateOptions.value.withLatestSnapshots(false) // TODO remove
-
 enablePlugins(
   UnidocRoot,
   UnidocWithPrValidation,
@@ -378,11 +376,7 @@ lazy val streamTestsTck = akkaModule("akka-stream-tests-tck")
   .disablePlugins(MimaPlugin, WhiteSourcePlugin)
 
 lazy val testkit = akkaModule("akka-testkit")
-//  .dependsOn(actor)
-  .settings(
-    version := "2.6.3-SNAPSHOT",
-    libraryDependencies += "com.typesafe.akka" %% "akka-actor" % version.value.stripSuffix("-SNAPSHOT") withDottyCompat scalaVersion.value
-  )
+  .dependsOn(actor)
   .settings(Dependencies.testkit)
   .settings(AutomaticModuleName.settings("akka.actor.testkit"))
   .settings(OSGi.testkit)
@@ -459,11 +453,7 @@ lazy val streamTyped = akkaModule("akka-stream-typed")
   .enablePlugins(ScaladocNoVerificationOfDiagrams)
 
 lazy val actorTestkitTyped = akkaModule("akka-actor-testkit-typed")
-  .dependsOn(/*actorTyped,*/ slf4j, testkit % "compile->compile;test->test")
-  .settings(
-    version := "2.6.3-SNAPSHOT",
-    libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % version.value.stripSuffix("-SNAPSHOT") withDottyCompat scalaVersion.value
-  )
+  .dependsOn(actorTyped, slf4j, testkit % "compile->compile;test->test")
   .settings(AutomaticModuleName.settings("akka.actor.testkit.typed"))
   .settings(Dependencies.actorTestkitTyped)
 
