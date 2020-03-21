@@ -15,7 +15,7 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import org.scalactic.CanEqual
 import org.scalactic.TypeCheckedTripleEquals
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterAll_8582, SuiteMixin}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.Millis
@@ -95,9 +95,10 @@ object AkkaSpec {
 
 abstract class AkkaSpec(_system: ActorSystem)
     extends TestKit(_system)
+    with SuiteMixin
     with AnyWordSpecLike
     with Matchers
-    with BeforeAndAfterAll
+    with BeforeAndAfterAll_8582
     with WatchedByCoroner
     with TypeCheckedTripleEquals
     with ScalaFutures {
