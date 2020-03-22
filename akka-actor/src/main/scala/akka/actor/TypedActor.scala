@@ -556,7 +556,7 @@ object TypedProps {
    *
    * Scala API
    */
-  def apply[T <: AnyRef: ClassTag](): TypedProps[T] =
+  def apply[T <: AnyRef: ClassTag]: TypedProps[T] =
     new TypedProps[T](implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
 
   /**
