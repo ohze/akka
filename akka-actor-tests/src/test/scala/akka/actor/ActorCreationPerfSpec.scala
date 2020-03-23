@@ -118,8 +118,7 @@ object ActorCreationPerfSpec {
 class ActorCreationPerfSpec
     extends AkkaSpec(ActorCreationPerfSpec.config)
     with ImplicitSender
-    with MetricsKit
-    with BeforeAndAfterAll {
+    with MetricsKit {
 
   import ActorCreationPerfSpec._
 
