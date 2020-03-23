@@ -5,12 +5,13 @@
 package akka.pattern
 
 import akka.testkit._
+
 import scala.collection.immutable
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{Await, ExecutionContextExecutor, Future}
 
 class CircuitBreakerMTSpec extends AkkaSpec {
-  implicit val ec = system.dispatcher
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
   "A circuit breaker being called by many threads" must {
     val callTimeout = 2.second.dilated
     val resetTimeout = 3.seconds.dilated

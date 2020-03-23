@@ -205,7 +205,7 @@ private[cluster] final class ClusterDaemon(joinConfigCompatChecker: JoinConfigCo
       if (Cluster(sys).isTerminated || Cluster(sys).selfMember.status == Down)
         Future.successful(Done)
       else {
-        implicit val timeout = Timeout(coordShutdown.timeout(CoordinatedShutdown.PhaseClusterLeave))
+        implicit val timeout: Timeout = Timeout(coordShutdown.timeout(CoordinatedShutdown.PhaseClusterLeave))
         self.ask(CoordinatedShutdownLeave.LeaveReq).mapTo[Done]
       }
   }
@@ -370,7 +370,7 @@ private[cluster] class ClusterCoreDaemon(publisher: ActorRef, joinConfigCompatCh
       if (Cluster(sys).isTerminated || Cluster(sys).selfMember.status == Down)
         Future.successful(Done)
       else {
-        implicit val timeout = Timeout(coordShutdown.timeout(CoordinatedShutdown.PhaseClusterExitingDone))
+        implicit val timeout: Timeout = Timeout(coordShutdown.timeout(CoordinatedShutdown.PhaseClusterExitingDone))
         self.ask(ExitingCompleted).mapTo[Done]
       }
   }

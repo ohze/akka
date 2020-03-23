@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 object DnsCompileOnlyDocSpec {
 
   implicit val system = ActorSystem()
-  implicit val timeout = Timeout(1.second)
+  implicit val timeout: Timeout = Timeout(1.second)
 
   val actorRef: ActorRef = ???
   //#resolve

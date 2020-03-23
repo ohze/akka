@@ -71,7 +71,7 @@ import akka.actor.typed.Terminated
                 Behaviors.same
 
               case cmd: JReplicator.Get[d] =>
-                implicit val timeout = Timeout(cmd.consistency.timeout match {
+                implicit val timeout: Timeout = Timeout(cmd.consistency.timeout match {
                   case java.time.Duration.ZERO => localAskTimeout
                   case t                       => t.asScala + additionalAskTimeout
                 })
@@ -99,7 +99,7 @@ import akka.actor.typed.Terminated
                 Behaviors.same
 
               case cmd: JReplicator.Update[d] =>
-                implicit val timeout = Timeout(cmd.writeConsistency.timeout match {
+                implicit val timeout: Timeout = Timeout(cmd.writeConsistency.timeout match {
                   case java.time.Duration.ZERO => localAskTimeout
                   case t                       => t.asScala + additionalAskTimeout
                 })
@@ -166,7 +166,7 @@ import akka.actor.typed.Terminated
                 Behaviors.same
 
               case cmd: JReplicator.Delete[d] =>
-                implicit val timeout = Timeout(cmd.consistency.timeout match {
+                implicit val timeout: Timeout = Timeout(cmd.consistency.timeout match {
                   case java.time.Duration.ZERO => localAskTimeout
                   case t                       => t.asScala + additionalAskTimeout
                 })
@@ -192,7 +192,7 @@ import akka.actor.typed.Terminated
                 Behaviors.same
 
               case JReplicator.GetReplicaCount(replyTo) =>
-                implicit val timeout = Timeout(localAskTimeout)
+                implicit val timeout: Timeout = Timeout(localAskTimeout)
                 import ctx.executionContext
                 val reply =
                   (classicReplicator ? dd.Replicator.GetReplicaCount)

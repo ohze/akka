@@ -616,7 +616,7 @@ final class CoordinatedShutdown private[akka] (
       stopMsg.foreach(msg => actor ! msg)
       import akka.pattern.ask
       // addTask will verify that phases(phase) exists, so this should be safe
-      implicit val timeout = Timeout(phases(phase).timeout)
+      implicit val timeout: Timeout = Timeout(phases(phase).timeout)
       (terminationWatcher ? CoordinatedShutdownTerminationWatcher.Watch(actor)).mapTo[Done]
     }
 

@@ -83,7 +83,7 @@ abstract class MultiDcClusterShardingSpec
   }
 
   "be able to ask via entity ref" in {
-    implicit val timeout = Timeout(remainingOrDefault)
+    implicit val timeout: Timeout = Timeout(remainingOrDefault)
     val entityRef = ClusterSharding(typedSystem).entityRefFor(typeKey, entityId)
     val response = entityRef ? Ping
     response.futureValue shouldEqual Pong(cluster.selfMember.dataCenter)

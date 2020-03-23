@@ -61,7 +61,7 @@ object AskPattern {
      * case class Reply(msg: String)
      *
      * implicit val system = ...
-     * implicit val timeout = Timeout(3.seconds)
+     * implicit val timeout: Timeout = Timeout(3.seconds)
      * val target: ActorRef[Request] = ...
      * val f: Future[Reply] = target ? (replyTo => Request("hello", replyTo))
      * }}}
@@ -94,7 +94,7 @@ object AskPattern {
      * case class Reply(msg: String)
      *
      * implicit val system = ...
-     * implicit val timeout = Timeout(3.seconds)
+     * implicit val timeout: Timeout = Timeout(3.seconds)
      * val target: ActorRef[Request] = ...
      * val f: Future[Reply] = target.ask(replyTo => Request("hello", replyTo))
      * // alternatively

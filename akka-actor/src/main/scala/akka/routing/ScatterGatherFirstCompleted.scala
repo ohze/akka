@@ -49,7 +49,7 @@ private[akka] final case class ScatterGatherFirstCompletedRoutees(
       val reply = Future.failed(new TimeoutException("Timeout due to no routees"))
       reply.pipeTo(sender)
     } else {
-      implicit val timeout = Timeout(within)
+      implicit val timeout: Timeout = Timeout(within)
       val promise = Promise[Any]()
       routees.foreach {
         case ActorRefRoutee(ref) =>

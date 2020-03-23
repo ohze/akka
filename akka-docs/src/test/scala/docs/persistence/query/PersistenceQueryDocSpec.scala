@@ -24,7 +24,7 @@ import com.typesafe.config.Config
 
 object PersistenceQueryDocSpec {
 
-  implicit val timeout = Timeout(3.seconds)
+  implicit val timeout: Timeout = Timeout(3.seconds)
 
   //#advanced-journal-query-types
   final case class RichEvent(tags: Set[String], payload: Any)
@@ -296,7 +296,7 @@ class PersistenceQueryDocSpec(s: String) extends AkkaSpec(s) {
         PersistenceQuery(system.toClassic).readJournalFor[MyScaladslReadJournal](JournalId)
 
       import system.executionContext
-      implicit val timeout = Timeout(3.seconds)
+      implicit val timeout: Timeout = Timeout(3.seconds)
 
       val bidProjection = new MyResumableProjection("bid")
 

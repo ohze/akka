@@ -5,15 +5,17 @@
 package akka.routing
 
 import language.postfixOps
-
 import akka.actor._
+import akka.actor.actorRef2Scala
+
 import scala.collection.immutable
 import akka.testkit._
+
 import scala.concurrent.duration._
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import akka.ConfigurationException
 import com.typesafe.config.ConfigFactory
-import akka.pattern.{ ask, pipe }
+import akka.pattern.{ask, pipe}
 
 object RoutingSpec {
 
@@ -47,7 +49,7 @@ object RoutingSpec {
 }
 
 class RoutingSpec extends AkkaSpec(RoutingSpec.config) with DefaultTimeout with ImplicitSender {
-  implicit val ec = system.dispatcher
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
   import RoutingSpec._
 
   muteDeadLetters(classOf[akka.dispatch.sysmsg.DeathWatchNotification])(system)

@@ -49,7 +49,7 @@ class AskBenchmark {
 
   var actor: ActorRef = _
 
-  implicit val timeout = Timeout(10.seconds)
+  implicit val timeout: Timeout = Timeout(10.seconds)
 
   @Param(Array("1", "4"))
   var parallelism = 0

@@ -382,7 +382,7 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
 
     val akkaTweets: Source[Tweet, NotUsed] = tweets.filter(_.hashtags.contains(akkaTag))
 
-    implicit val timeout = Timeout(3.seconds)
+    implicit val timeout: Timeout = Timeout(3.seconds)
     val saveTweets: RunnableGraph[NotUsed] =
       akkaTweets.mapAsync(4)(tweet => database ? Save(tweet)).to(Sink.ignore)
     //#save-tweets

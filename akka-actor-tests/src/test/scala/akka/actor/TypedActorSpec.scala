@@ -127,7 +127,7 @@ object TypedActorSpec {
 
     def futurePigdog(delay: FiniteDuration): Future[String] = {
       Thread.sleep(delay.toMillis)
-      futurePigdog
+      futurePigdog()
     }
 
     def futurePigdog(delay: FiniteDuration, numbered: Int): Future[String] = {
@@ -408,14 +408,14 @@ class TypedActorSpec
         t.failingPigdog()
         t.read() should ===(1) //Make sure state is not reset after failure
 
-        intercept[IllegalStateException] { Await.result(t.failingFuturePigdog, 2 seconds) }.getMessage should ===(
+        intercept[IllegalStateException] { Await.result(t.failingFuturePigdog(), 2 seconds) }.getMessage should ===(
           "expected")
         t.read() should ===(1) //Make sure state is not reset after failure
 
-        intercept[IllegalStateException] { t.failingJOptionPigdog }.getMessage should ===("expected")
+        intercept[IllegalStateException] { t.failingJOptionPigdog() }.getMessage should ===("expected")
         t.read() should ===(1) //Make sure state is not reset after failure
 
-        intercept[IllegalStateException] { t.failingOptionPigdog }.getMessage should ===("expected")
+        intercept[IllegalStateException] { t.failingOptionPigdog() }.getMessage should ===("expected")
 
         t.read() should ===(1) //Make sure state is not reset after failure
 

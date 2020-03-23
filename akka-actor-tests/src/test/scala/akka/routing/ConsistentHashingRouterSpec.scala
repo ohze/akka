@@ -4,7 +4,7 @@
 
 package akka.routing
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContextExecutor}
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
@@ -56,7 +56,7 @@ class ConsistentHashingRouterSpec
     with DefaultTimeout
     with ImplicitSender {
   import ConsistentHashingRouterSpec._
-  implicit val ec = system.dispatcher
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
 
   val router1 = system.actorOf(FromConfig.props(Props[Echo]), "router1")
 

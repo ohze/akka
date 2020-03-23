@@ -118,7 +118,7 @@ trait Player { this: TestConductorExt =>
         throw new TimeoutException("Server timed out while waiting for barrier " + b)
       }
       try {
-        implicit val timeout = Timeout(barrierTimeout + Settings.QueryTimeout.duration)
+        implicit val timeout: Timeout = Timeout(barrierTimeout + Settings.QueryTimeout.duration)
         Await.result(client ? ToServer(EnterBarrier(b, Option(barrierTimeout))), Duration.Inf)
       } catch {
         case _: AskTimeoutException =>

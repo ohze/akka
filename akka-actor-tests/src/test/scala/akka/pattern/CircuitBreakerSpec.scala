@@ -5,12 +5,10 @@
 package akka.pattern
 
 import akka.actor.ActorSystem
+import akka.actor.actorRef2Scala
 import akka.testkit._
 
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.concurrent.TimeoutException
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future, TimeoutException}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.Failure
@@ -83,7 +81,7 @@ object CircuitBreakerSpec {
 
 class CircuitBreakerSpec extends AkkaSpec {
   import CircuitBreakerSpec._
-  implicit def ec = system.dispatcher
+  implicit def ec: ExecutionContextExecutor = system.dispatcher
 
   val awaitTimeout = 2.seconds.dilated
 
@@ -179,7 +177,7 @@ class CircuitBreakerSpec extends AkkaSpec {
       val breaker = shortResetTimeoutCb()
       intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
       checkLatch(breaker.halfOpenLatch)
-      breaker.openLatch.reset
+      breaker.openLatch.reset()
       intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
       checkLatch(breaker.openLatch)
     }
@@ -189,7 +187,7 @@ class CircuitBreakerSpec extends AkkaSpec {
         val breaker = shortResetTimeoutCb()
         intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
         checkLatch(breaker.halfOpenLatch)
-        breaker.openLatch.reset
+        breaker.openLatch.reset()
         breaker().withSyncCircuitBreaker(2, evenNumberIsFailure)
         checkLatch(breaker.openLatch)
       }
@@ -199,7 +197,7 @@ class CircuitBreakerSpec extends AkkaSpec {
       val breaker = shortResetTimeoutCb()
       intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
       checkLatch(breaker.halfOpenLatch)
-      breaker.openLatch.reset
+      breaker.openLatch.reset()
       breaker().fail()
       checkLatch(breaker.openLatch)
     }
@@ -450,7 +448,7 @@ class CircuitBreakerSpec extends AkkaSpec {
       checkLatch(breaker.halfOpenLatch)
 
       // transit to open again
-      breaker.openLatch.reset
+      breaker.openLatch.reset()
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.openLatch)
 
@@ -512,7 +510,7 @@ class CircuitBreakerSpec extends AkkaSpec {
       val breaker = shortResetTimeoutCb()
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.halfOpenLatch)
-      breaker.openLatch.reset
+      breaker.openLatch.reset()
       intercept[TestException] { Await.result(breaker().withCircuitBreaker(Future(throwException)), awaitTimeout) }
       checkLatch(breaker.openLatch)
     }
@@ -522,7 +520,7 @@ class CircuitBreakerSpec extends AkkaSpec {
         val breaker = shortResetTimeoutCb()
         intercept[TestException] { breaker().withSyncCircuitBreaker(throwException) }
         checkLatch(breaker.halfOpenLatch)
-        breaker.openLatch.reset
+        breaker.openLatch.reset()
         Await.result(breaker().withCircuitBreaker(Future(2), evenNumberIsFailure), awaitTimeout)
         checkLatch(breaker.openLatch)
       }
@@ -533,7 +531,7 @@ class CircuitBreakerSpec extends AkkaSpec {
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.halfOpenLatch)
 
-      breaker.openLatch.reset
+      breaker.openLatch.reset()
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.openLatch)
     }

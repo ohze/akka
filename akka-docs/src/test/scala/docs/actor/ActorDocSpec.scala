@@ -485,7 +485,7 @@ class ActorDocSpec extends AkkaSpec("""
     import scala.concurrent.duration._
     import akka.util.Timeout
     import akka.pattern.ask
-    implicit val timeout = Timeout(5 seconds)
+    implicit val timeout: Timeout = Timeout(5 seconds)
     val future = myActor ? "hello"
     //#using-implicit-timeout
     Await.result(future, timeout.duration) should be("hello")
@@ -682,7 +682,7 @@ class ActorDocSpec extends AkkaSpec("""
     final case class Result(x: Int, s: String, d: Double)
     case object Request
 
-    implicit val timeout = Timeout(5 seconds) // needed for `?` below
+    implicit val timeout: Timeout = Timeout(5 seconds) // needed for `?` below
 
     val f: Future[Result] =
       for {
@@ -729,7 +729,7 @@ class ActorDocSpec extends AkkaSpec("""
     CoordinatedShutdown(system).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "someTaskName") { () =>
       import akka.pattern.ask
       import system.dispatcher
-      implicit val timeout = Timeout(5.seconds)
+      implicit val timeout: Timeout = Timeout(5.seconds)
       (someActor ? "stop").map(_ => Done)
     }
     //#coordinated-shutdown-addTask

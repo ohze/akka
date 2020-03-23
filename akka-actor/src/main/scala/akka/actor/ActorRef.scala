@@ -56,7 +56,7 @@ object ActorRef {
  *     case Request1(msg) => other ! refine(msg)     // uses this actor as sender reference, reply goes to us
  *     case Request2(msg) => other.tell(msg, sender()) // forward sender reference, enabling direct reply
  *     case Request3(msg) =>
- *       implicit val timeout = Timeout(5.seconds)
+ *       implicit val timeout: Timeout = Timeout(5.seconds)
  *       (other ? msg) pipeTo sender()
  *       // the ask call will get a future from other's reply
  *       // when the future is complete, send its value to the original sender

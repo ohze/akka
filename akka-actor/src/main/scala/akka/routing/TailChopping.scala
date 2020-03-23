@@ -70,7 +70,7 @@ private[akka] final case class TailChoppingRoutees(
     extends Routee {
 
   override def send(message: Any, sender: ActorRef): Unit = {
-    implicit val timeout = Timeout(within)
+    implicit val timeout: Timeout = Timeout(within)
     val promise = Promise[Any]()
     val shuffled = Random.shuffle(routees)
 

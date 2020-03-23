@@ -437,7 +437,7 @@ object EntityTypeKey {
    * case class Request(msg: String, replyTo: ActorRef[Reply])
    * case class Reply(msg: String)
    *
-   * implicit val timeout = Timeout(3.seconds)
+   * implicit val timeout: Timeout = Timeout(3.seconds)
    * val target: EntityRef[Request] = ...
    * val f: Future[Reply] = target.ask(Request("hello", _))
    * }}}
@@ -460,7 +460,7 @@ object EntityTypeKey {
    * case class Request(msg: String, replyTo: ActorRef[Reply])
    * case class Reply(msg: String)
    *
-   * implicit val timeout = Timeout(3.seconds)
+   * implicit val timeout: Timeout = Timeout(3.seconds)
    * val target: EntityRef[Request] = ...
    * val f: Future[Reply] = target ? (replyTo => Request("hello", replyTo))
    * }}}
