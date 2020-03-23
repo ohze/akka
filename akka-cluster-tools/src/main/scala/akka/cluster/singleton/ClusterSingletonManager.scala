@@ -551,7 +551,7 @@ class ClusterSingletonManager(singletonProps: Props, terminationMessage: Any, se
     if (cluster.isTerminated || cluster.selfMember.status == MemberStatus.Down) {
       Future.successful(Done)
     } else {
-      implicit val timeout: Timeout = Timeout(coordShutdown.timeout(CoordinatedShutdown.PhaseClusterExiting))
+      implicit val timeout: akka.util.Timeout = Timeout(coordShutdown.timeout(CoordinatedShutdown.PhaseClusterExiting))
       self.ask(SelfExiting).mapTo[Done]
     }
   }
