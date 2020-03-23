@@ -149,6 +149,11 @@ object Dependencies {
       // docker utils
       val dockerClient = "com.spotify" % "docker-client" % "8.16.0" % "test" // ApacheV2
 
+      // To fix akka-actor-tests/test:compile errors in dotty:
+      // Bad symbolic reference. A signature refers to Nullable/T in package javax.annotation which is not available.
+      // javax.annotation.Nullable is used in jimfs, docker-client, guava,..
+      val jsr305 = "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test"
+
       // metrics, measurements, perf testing
       val metrics = "io.dropwizard.metrics" % "metrics-core" % "4.1.5" % "test" // ApacheV2
       val metricsJvm = "io.dropwizard.metrics" % "metrics-jvm" % "4.1.5" % "test" // ApacheV2
@@ -210,6 +215,7 @@ object Dependencies {
         Test.scalacheck.value,
         Test.jimfs,
         Test.dockerClient,
+        Test.jsr305,
         Provided.activation // dockerClient needs javax.activation.DataSource in JDK 11+
       )
 
