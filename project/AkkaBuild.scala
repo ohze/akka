@@ -129,7 +129,7 @@ object AkkaBuild {
       else options
         .filterNot(x =>
           x == "-Xlog-reflective-calls" || x.startsWith("-language:")
-        ) :+ "-language:higherKinds,implicitConversions"
+        ) :+ "-language:higherKinds,implicitConversions" //:+ "-Ydebug-error"
     },
     scalacOptions in Test := (scalacOptions in Test).value.filterNot(opt =>
       opt == "-Xlog-reflective-calls" || opt.contains("genjavadoc")),
@@ -144,6 +144,8 @@ object AkkaBuild {
 
     unmanagedSourceSetting(Compile),
     unmanagedSourceSetting(Test),
+    // https://github.com/lampepfl/dotty/issues/8581
+    dependencyOverrides += "com.sandinh" %% "scalactic" % "3.1.1-dottybug8581" % Test,
 
     ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet,
 
