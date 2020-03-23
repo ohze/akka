@@ -67,7 +67,7 @@ object TypedActorSpec {
   }
 
   trait Foo {
-    def pigdog(): String
+    def pigdog: String
 
     @silent
     @throws(classOf[TimeoutException])
@@ -332,7 +332,7 @@ class TypedActorSpec
 
     "be able to call normally returning methods" in {
       val t = newFooBar
-      t.pigdog() should ===("Pigdog")
+      t.pigdog should ===("Pigdog")
       mustStop(t)
     }
 
