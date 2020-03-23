@@ -89,6 +89,21 @@ object AkkaBuild {
 
   private def allWarnings: Boolean = System.getProperty("akka.allwarnings", "false").toBoolean
 
+  private def unmanagedSourceSetting(conf: Configuration) =
+    unmanagedSourceDirectories in conf ++= {
+      val sourceDir = (sourceDirectory in conf).value
+      // Adds a `src/main/scala-2.13+` source directory for Scala 2.13 and newer
+      // and a `src/main/scala-2.13-` source directory for Scala version older than 2.13
+      val dir13 = CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, n)) if n < 13 => "scala-2.13-"
+        case _                      => "scala-2.13+"
+      }
+      val majorDir = CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, _)) => "scala-2"
+        case _ => "scala-3"
+      }
+      Seq(dir13, majorDir).map(sourceDir / _)
+    }
   final val DefaultScalacOptions = Seq(
     "-encoding", "UTF-8",
     "-feature",
@@ -127,20 +142,8 @@ object AkkaBuild {
 
     crossVersion := CrossVersion.binary,
 
-    unmanagedSourceDirectories in Compile ++= {
-      val sourceDir = (sourceDirectory in Compile).value
-      // Adds a `src/main/scala-2.13+` source directory for Scala 2.13 and newer
-      // and a `src/main/scala-2.13-` source directory for Scala version older than 2.13
-      val dir13 = CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, n)) if n < 13 => "scala-2.13-"
-        case _                      => "scala-2.13+"
-      }
-      val majorDir = CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, _)) => "scala-2"
-        case _ => "scala-3"
-      }
-      Seq(dir13, majorDir).map(sourceDir / _)
-    },
+    unmanagedSourceSetting(Compile),
+    unmanagedSourceSetting(Test),
 
     ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet,
 
