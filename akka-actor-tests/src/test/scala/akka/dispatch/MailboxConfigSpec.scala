@@ -16,7 +16,7 @@ import akka.util.unused
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
 
-abstract class MailboxSpec extends AkkaSpec with BeforeAndAfterAll with BeforeAndAfterEach {
+abstract class MailboxSpec extends AkkaSpec with BeforeAndAfterEach {
   def name: String
 
   def factory: MailboxType => MessageQueue

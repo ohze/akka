@@ -15,7 +15,7 @@ import scala.concurrent.Await
 import akka.pattern.ask
 import scala.concurrent.duration._
 
-class Ticket669Spec extends AkkaSpec with BeforeAndAfterAll with ImplicitSender with DefaultTimeout {
+class Ticket669Spec extends AkkaSpec with ImplicitSender with DefaultTimeout {
   import Ticket669Spec._
 
   // TODO: does this really make sense?

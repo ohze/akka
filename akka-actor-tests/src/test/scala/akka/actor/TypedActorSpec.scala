@@ -250,7 +250,6 @@ object TypedActorSpec {
 class TypedActorSpec
     extends AkkaSpec(TypedActorSpec.config)
     with BeforeAndAfterEach
-    with BeforeAndAfterAll
     with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
@@ -574,7 +573,6 @@ class TypedActorSpec
 class TypedActorRouterSpec
     extends AkkaSpec(TypedActorSpec.config)
     with BeforeAndAfterEach
-    with BeforeAndAfterAll
     with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
