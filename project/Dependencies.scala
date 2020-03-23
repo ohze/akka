@@ -121,18 +121,22 @@ object Dependencies {
       // but the version of each module starts with the scalatest
       // version it was intended to work with
       private val scalatestVersionRegex = "([0-9.]+)(-\\w+)?".r // ex: 3.1.1 | 3.2.0-M4
-      private def scalatestplus(name: String, patch: Int = 0, org: String = "org.scalatestplus") = Def.setting {
+      private def scalatestplus(name: String,
+                                patch: Int = 0,
+                                org: String = "org.scalatestplus",
+                                dottyCompat: Boolean = true) = Def.setting {
         val v = scalaTestVersion match {
           case scalatestVersionRegex(v, suffix) => s"$v.$patch" + Option(suffix).getOrElse("")
         }
         val sv = scalaVersion.value
-        val m = org %% name % v % "test"
-        if (org != "org.scalatestplus") m excludeAll "org.scalatest"
-        else m withDottyCompat sv
+        var m = org %% name % v % "test"
+        if (scalatestOrg.value != "org.scalatestplus") m = m excludeAll "org.scalatest"
+        if (dottyCompat) m = m withDottyCompat sv
+        m
       }
       val scalatestJUnit = scalatestplus("junit-4-12") // ApacheV2
       val scalatestTestNG = scalatestplus("testng-6-7")// ApacheV2
-      val scalatestScalaCheck = scalatestplus("scalacheck-1-14", 1, "com.sandinh") // ApacheV2
+      val scalatestScalaCheck = scalatestplus("scalacheck-1-14", 1, "com.sandinh", false) // ApacheV2
       val scalatestMockito = scalatestplus("mockito-3-2") // ApacheV2
 
       val pojosr = "com.googlecode.pojosr" % "de.kalpatec.pojosr.framework" % "0.2.1" % "test" // ApacheV2
