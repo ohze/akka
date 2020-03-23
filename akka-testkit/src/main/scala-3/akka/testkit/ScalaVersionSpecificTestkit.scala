@@ -8,7 +8,7 @@ import akka.actor.ActorSystem
 
 import ScalaVersionSpecificTestkit._
 
-class ScalaVersionSpecificTestkit(_system: ActorSystem) extends EarlyInit(using _system) with TestKitBase
+abstract class ScalaVersionSpecificTestkit(_system: ActorSystem) extends EarlyInit(using _system) with TestKitBase
 object ScalaVersionSpecificTestkit {
   private[testkit] trait EarlyInit(implicit val system: ActorSystem)
 }

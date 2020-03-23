@@ -31,7 +31,7 @@ object EventBusSpec {
 import EventBusSpec._
 abstract class EventBusSpec[
   Event, Classifier, Subscriber,
-  BusType <: EventBusAux[Event, Classifier, Subscriber]
+  BusType <: EventBusSpec.EventBusAux[Event, Classifier, Subscriber]
 ](busName: String, conf: Config = ConfigFactory.empty())
     extends AkkaSpec(conf)
     with BeforeAndAfterEach {

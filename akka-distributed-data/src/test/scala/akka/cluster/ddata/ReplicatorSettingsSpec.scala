@@ -20,8 +20,7 @@ object ReplicatorSettingsSpec {
 
 class ReplicatorSettingsSpec
     extends AkkaSpec(ReplicatorSettingsSpec.config)
-    with AnyWordSpecLike
-    with BeforeAndAfterAll {
+    with AnyWordSpecLike {
 
   "DistributedData" must {
     "have the default replicator name" in {
