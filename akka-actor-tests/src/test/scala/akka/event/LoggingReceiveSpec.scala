@@ -29,14 +29,15 @@ class LoggingReceiveSpec extends AnyWordSpec with BeforeAndAfterAll {
   val config = ConfigFactory.parseString("""
     akka.loglevel=DEBUG # test verifies debug
     """).withFallback(AkkaSpec.testConf)
-  val appLogging =
-    ActorSystem("logging", ConfigFactory.parseMap(Map("akka.actor.debug.receive" -> true).asJava).withFallback(config))
-  val appAuto = ActorSystem(
-    "autoreceive",
-    ConfigFactory.parseMap(Map("akka.actor.debug.autoreceive" -> true).asJava).withFallback(config))
-  val appLifecycle = ActorSystem(
-    "lifecycle",
-    ConfigFactory.parseMap(Map("akka.actor.debug.lifecycle" -> true).asJava).withFallback(config))
+
+  private def debugActorSystem(name: String, debugKey: String) = {
+    // https://github.com/lampepfl/dotty/issues/8588
+    val m = Map(s"akka.actor.debug.$debugKey" -> (true: java.lang.Boolean))
+    ActorSystem(name, ConfigFactory.parseMap(m.asJava).withFallback(config))
+  }
+  val appLogging = debugActorSystem("logging", "receive")
+  val appAuto = debugActorSystem("autoreceive", "autoreceive")
+  val appLifecycle = debugActorSystem("lifecycle", "lifecycle")
 
   val filter = TestEvent.Mute(EventFilter.custom {
     case _: Logging.Debug => true
