@@ -100,6 +100,17 @@ lazy val actorTests = akkaModule("akka-actor-tests")
   .settings(Dependencies.actorTests)
   .enablePlugins(NoPublish)
   .disablePlugins(MimaPlugin, WhiteSourcePlugin)
+  .settings(
+    // https://github.com/lampepfl/dotty/issues/8599
+    Test / sources := {
+      val dir = (Test / javaSource).value
+      val excludes = Seq(
+        "akka/actor/StashJavaAPITestActors.java",
+        "akka/actor/StashJavaAPI.java",
+      ).map( dir / _)
+      (Test / sources).value.filterNot(excludes.contains)
+    }
+  )
 
 lazy val akkaScalaNightly = akkaModule("akka-scala-nightly")
   .aggregate(aggregatedProjects: _*)

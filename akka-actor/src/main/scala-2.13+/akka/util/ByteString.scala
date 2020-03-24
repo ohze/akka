@@ -112,9 +112,21 @@ object ByteString {
    * JAVA API
    * Creates a new ByteString by copying an int array by converting from integral numbers to bytes.
    */
+//  @varargs
+//  def fromInts(array: Int*): ByteString =
+//    apply(array: _*)(scala.math.Numeric.IntIsIntegral)
+  // TODO remove
+  // workaround for https://github.com/lampepfl/dotty/issues/7212
+  import scala.collection.immutable
+  import scala.math.{Numeric => N}
+  def fromInts(): ByteString = CompactByteString.empty
+  def fromInts(a1: Int): ByteString = apply(a1)(N.IntIsIntegral)
+  def fromInts(a1: Int, a2: Int): ByteString = apply(a1, a2)(N.IntIsIntegral)
+  def fromInts(a1: Int, a2: Int, a3: Int): ByteString = apply(a1, a2, a3)(N.IntIsIntegral)
+  def fromInts(a1: Int, a2: Int, a3: Int, a4: Int): ByteString = apply(a1, a2, a4)(N.IntIsIntegral)
   @varargs
-  def fromInts(array: Int*): ByteString =
-    apply(array: _*)(scala.math.Numeric.IntIsIntegral)
+  def fromInts(a1: Int, a2: Int, a3: Int, a4: Int, array: Int*): ByteString =
+    apply(immutable.Seq(a1, a2, a4) ++ array: _*)(N.IntIsIntegral)
 
   /**
    * Creates a new ByteString which will contain the UTF-8 representation of the given String

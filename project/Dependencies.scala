@@ -128,9 +128,9 @@ object Dependencies {
         if (!customDottyBuild) m = m withDottyCompat sv
         m
       }
-      val scalatestJUnit = scalatestplus("junit-4-12") // ApacheV2
+      val scalatestJUnit = scalatestplus("junit-4-12", customDottyBuild = true) // ApacheV2
       val scalatestTestNG = scalatestplus("testng-6-7")// ApacheV2
-      val scalatestScalaCheck = scalatestplus("scalacheck-1-14", 1, true) // ApacheV2
+      val scalatestScalaCheck = scalatestplus("scalacheck-1-14", 1, customDottyBuild = true) // ApacheV2
       val scalatestMockito = scalatestplus("mockito-3-2") // ApacheV2
 
       val pojosr = "com.googlecode.pojosr" % "de.kalpatec.pojosr.framework" % "0.2.1" % "test" // ApacheV2
