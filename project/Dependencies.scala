@@ -25,7 +25,9 @@ object Dependencies {
   val protobufJavaVersion = "3.10.0"
   val logbackVersion = "1.2.3"
 
-  val scala3Version = "0.23.0-RC1"
+  // need 0.24 because of https://github.com/lampepfl/dotty/issues/8582
+  val scala3Version = "0.24.0-bin-20200324-6cd3a9d-NIGHTLY"
+  //  val scala3Version = "0.23.0-RC1"
   val scala212Version = "2.12.11"
   val scala213Version = "2.13.1"
 
@@ -33,10 +35,19 @@ object Dependencies {
 
   val sslConfigVersion = "0.4.1"
 
+  private lazy val versionSuffix = Def.setting {
+    val sv = scalaVersion.value
+    val isDottyNightly = isDotty.value && sv.length > 10 // // "0.xx.0-bin".length
+    if (isDottyNightly) "-dotty" + sv.substring(10)
+    else ""
+  }
   val scalaTestVersion = "3.1.1"
   // TODO change back to org.scalatest when scalatest is published for dotty 0.23
   private def scalatestOrg = Def.setting {
-    if (scalaVersion.value.startsWith("0.23.")) "com.sandinh" else "org.scalatest"
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((0, 23|24)) => "com.sandinh"
+      case _                => "org.scalatest"
+    }
   }
   val scalaCheckVersion = "1.14.3"
 
@@ -114,7 +125,7 @@ object Dependencies {
       val junit = "junit" % "junit" % junitVersion % "test" // Common Public License 1.0
       val logback = Compile.logback % "test" // EPL 1.0
 
-      val scalatest = Def.setting { scalatestOrg.value %% "scalatest" % scalaTestVersion % "test" } // ApacheV2
+      val scalatest = Def.setting { scalatestOrg.value %% "scalatest" % (scalaTestVersion + versionSuffix.value) % "test" } // ApacheV2
       val scalacheck = Def.setting { "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test" withDottyCompat scalaVersion.value } // New BSD
 
       // The 'scalaTestPlus' projects are independently versioned,
@@ -123,7 +134,8 @@ object Dependencies {
       private def scalatestplus(name: String, patch: Int = 0, customDottyBuild: Boolean = false) = Def.setting {
         val sv = scalaVersion.value
         val org = if (isDotty.value && customDottyBuild) "com.sandinh" else "org.scalatestplus"
-        var m = org %% name % s"$scalaTestVersion.$patch" % "test"
+        val v = s"$scalaTestVersion.$patch" + (if (customDottyBuild) versionSuffix.value else "")
+        var m = org %% name % v % "test"
         if (scalatestOrg.value != "org.scalatest") m = m excludeAll "org.scalatest"
         if (!customDottyBuild) m = m withDottyCompat sv
         m
@@ -177,7 +189,7 @@ object Dependencies {
 
       val junit = Compile.junit % "optional;provided;test"
 
-      val scalatest = Def.setting { scalatestOrg.value %% "scalatest" % scalaTestVersion % "optional;provided;test" } // ApacheV2
+      val scalatest = Test.scalatest(_.withConfigurations(Some("optional;provided;test"))) // ApacheV2
 
       val logback = Compile.logback % "optional;provided;test" // EPL 1.0
 

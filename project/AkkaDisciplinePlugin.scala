@@ -50,7 +50,7 @@ object AkkaDisciplinePlugin extends AutoPlugin with ScalafixSupport {
   implicit class DottyCompatModuleID(val moduleID: ModuleID) extends AnyVal {
     def withDottyFullCompat(scalaVersion: String): ModuleID = {
       CrossVersion.partialVersion(scalaVersion) match {
-        case Some((0, 22 | 23)) => moduleID cross CrossVersion.constant("2.13.1")
+        case Some((0, 22 | 23 | 24)) => moduleID cross CrossVersion.constant("2.13.1")
         case Some((0 | 3, _)) => ??? // TODO
         case _ => moduleID cross CrossVersion.patch
       }

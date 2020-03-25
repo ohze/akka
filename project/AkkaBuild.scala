@@ -144,8 +144,6 @@ object AkkaBuild {
 
     unmanagedSourceSetting(Compile),
     unmanagedSourceSetting(Test),
-    // https://github.com/lampepfl/dotty/issues/8581
-    dependencyOverrides += "com.sandinh" %% "scalactic" % "3.1.1-dottybug8581" % Test,
 
     ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet,
 
