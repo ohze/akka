@@ -103,12 +103,17 @@ lazy val actorTests = akkaModule("akka-actor-tests")
   .settings(
     // https://github.com/lampepfl/dotty/issues/8599
     Test / sources := {
+      val old = (Test / sources).value
       val dir = (Test / javaSource).value
-      val excludes = Seq(
-        "akka/actor/StashJavaAPITestActors.java",
-        "akka/actor/StashJavaAPI.java",
-      ).map( dir / _)
-      (Test / sources).value.filterNot(excludes.contains)
+      if (isDotty.value) {
+        val excludes = Seq(
+          "akka/actor/StashJavaAPITestActors.java",
+          "akka/actor/StashJavaAPI.java",
+        ).map(dir / _)
+        old.filterNot(excludes.contains)
+      } else {
+        old
+      }
     }
   )
 
