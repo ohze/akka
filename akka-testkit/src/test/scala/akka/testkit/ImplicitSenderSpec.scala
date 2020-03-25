@@ -5,11 +5,11 @@
 package akka.testkit
 
 import akka.actor.ActorSystem
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterAll_8582, SuiteMixin}
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
+import org.scalatest.wordspec.AnyWordSpec
 
-class ImplicitSenderSpec extends SuiteMixin with AnyWordSpecLike with Matchers with BeforeAndAfterAll_8582 with TestKitBase with ImplicitSender {
+class ImplicitSenderSpec extends AnyWordSpec with Matchers with BeforeAndAfterAll with TestKitBase with ImplicitSender {
 
   implicit lazy val system: ActorSystem = ActorSystem("AkkaCustomSpec")
 

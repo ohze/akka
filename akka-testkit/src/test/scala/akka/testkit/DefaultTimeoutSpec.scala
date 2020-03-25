@@ -4,12 +4,12 @@
 
 package akka.testkit
 
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterAll_8582, SuiteMixin}
+import org.scalatest.BeforeAndAfterAll
 import akka.actor.ActorSystem
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
+import org.scalatest.wordspec.AnyWordSpec
 
-class DefaultTimeoutSpec extends SuiteMixin with AnyWordSpecLike with Matchers with BeforeAndAfterAll_8582 with TestKitBase with DefaultTimeout {
+class DefaultTimeoutSpec extends AnyWordSpec with Matchers with BeforeAndAfterAll with TestKitBase with DefaultTimeout {
 
   implicit lazy val system = ActorSystem("AkkaCustomSpec")
 

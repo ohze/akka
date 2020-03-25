@@ -5,11 +5,11 @@
 package akka.event
 
 import language.postfixOps
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterAll_8582, SuiteMixin}
 
+import org.scalatest.BeforeAndAfterAll
 import scala.concurrent.duration._
 import akka.testkit._
-import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
+import org.scalatest.wordspec.AnyWordSpec
 import com.typesafe.config.ConfigFactory
 import akka.util.ccompat.JavaConverters._
 import akka.actor._
@@ -24,7 +24,7 @@ object LoggingReceiveSpec {
   }
 }
 
-class LoggingReceiveSpec extends SuiteMixin with AnyWordSpecLike with BeforeAndAfterAll_8582 {
+class LoggingReceiveSpec extends AnyWordSpec with BeforeAndAfterAll {
 
   import LoggingReceiveSpec._
   val config = ConfigFactory.parseString("""

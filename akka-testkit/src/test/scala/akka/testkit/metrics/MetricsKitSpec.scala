@@ -7,9 +7,9 @@ package akka.testkit.metrics
 import org.scalatest._
 import com.typesafe.config.ConfigFactory
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
+import org.scalatest.wordspec.AnyWordSpec
 
-class MetricsKitSpec extends SuiteMixin with AnyWordSpecLike with Matchers with BeforeAndAfter with BeforeAndAfterAll_8582 with MetricsKit {
+class MetricsKitSpec extends AnyWordSpec with Matchers with BeforeAndAfter with BeforeAndAfterAll with MetricsKit {
 
   import scala.concurrent.duration._
 

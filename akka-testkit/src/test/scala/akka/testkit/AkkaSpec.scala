@@ -15,7 +15,7 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import org.scalactic.CanEqual
 import org.scalactic.TypeCheckedTripleEquals
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterAll_8582, SuiteMixin}
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.Millis
@@ -47,6 +47,7 @@ object AkkaSpec {
 
   def mapToConfig(map: Map[String, Any]): Config = {
     import akka.util.ccompat.JavaConverters._
+    // https://github.com/lampepfl/dotty/issues/8588
     ConfigFactory.parseMap(map.asInstanceOf[Map[String, AnyRef]].asJava)
   }
 
@@ -95,10 +96,9 @@ object AkkaSpec {
 
 abstract class AkkaSpec(_system: ActorSystem)
     extends TestKit(_system)
-    with SuiteMixin
     with AnyWordSpecLike
     with Matchers
-    with BeforeAndAfterAll_8582
+    with BeforeAndAfterAll
     with WatchedByCoroner
     with TypeCheckedTripleEquals
     with ScalaFutures {
