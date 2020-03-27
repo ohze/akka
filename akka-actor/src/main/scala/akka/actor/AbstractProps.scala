@@ -33,9 +33,31 @@ private[akka] trait AbstractProps {
   /**
    * Java API: create a Props given a class and its constructor arguments.
    */
+//  @varargs
+//  def create(clazz: Class[_], args: AnyRef*): Props =
+//    new Props(deploy = Props.defaultDeploy, clazz = clazz, args = args.toList)
+  // TODO remove
+  // workaround for https://github.com/lampepfl/dotty/issues/7212
+  import scala.collection.immutable
+  def create(clazz: Class[_]): Props =
+    new Props(deploy = Props.defaultDeploy, clazz = clazz, args = immutable.Seq())
+  def create(clazz: Class[_], a1: AnyRef): Props = {
+    val args = a1 match {
+      case a: Array[AnyRef] => a.toList
+      case a                => immutable.Seq(a)
+    }
+    new Props(deploy = Props.defaultDeploy, clazz = clazz, args)
+  }
+
+  def create(clazz: Class[_], a1: AnyRef, a2: AnyRef): Props =
+    new Props(deploy = Props.defaultDeploy, clazz = clazz, args = immutable.Seq(a1, a2))
+  def create(clazz: Class[_], a1: AnyRef, a2: AnyRef, a3: AnyRef): Props =
+    new Props(deploy = Props.defaultDeploy, clazz = clazz, args = immutable.Seq(a1, a2, a3))
+  def create(clazz: Class[_], a1: AnyRef, a2: AnyRef, a3: AnyRef, a4: AnyRef): Props =
+    new Props(deploy = Props.defaultDeploy, clazz = clazz, args = immutable.Seq(a1, a2, a3, a4))
   @varargs
-  def create(clazz: Class[_], args: AnyRef*): Props =
-    new Props(deploy = Props.defaultDeploy, clazz = clazz, args = args.toList)
+  def create(clazz: Class[_], a1: AnyRef, a2: AnyRef, a3: AnyRef, a4: AnyRef, args: AnyRef*): Props =
+    new Props(deploy = Props.defaultDeploy, clazz = clazz, args = immutable.Seq(a1, a2, a3, a4) ++ args)
 
   /**
    * Create new Props from the given [[akka.japi.Creator]].

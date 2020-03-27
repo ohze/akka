@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
 import akka.actor.typed.internal.PropsImpl._
 import akka.util.ccompat.JavaConverters._
 
-import scala.annotation.varargs
+//import scala.annotation.varargs
 
 object Props {
 
@@ -240,8 +240,14 @@ object ActorTags {
   /**
    * Java API: create a tag props with one or more tags
    */
-  @varargs
-  def create(tags: String*): ActorTags = apply(tags.toSet)
+//  @varargs
+//  def create(tags: String*): ActorTags = apply(tags.toSet)
+  // https://github.com/lampepfl/dotty/issues/7212
+  def create(): ActorTags = apply(Set.empty[String])
+  def create(a1: String): ActorTags = apply(Set(a1))
+  def create(a1: String, a2: String): ActorTags = apply(Set(a1, a2))
+  def create(a1: String, a2: String, a3: String): ActorTags = apply(Set(a1, a2, a3))
+  def create(a1: String, a2: String, a3: String, tags: String*): ActorTags = apply(Set(a1, a2, a3) ++ tags.toSet)
 
   /**
    * Java API: create a multi-tag props
