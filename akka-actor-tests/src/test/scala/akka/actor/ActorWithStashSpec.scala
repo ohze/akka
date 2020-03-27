@@ -15,7 +15,7 @@ import com.github.ghik.silencer.silent
 
 import scala.concurrent.duration._
 import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.junit.JUnitSuiteLike
+//import org.scalatestplus.junit.JUnitSuiteLike
 
 object ActorWithStashSpec {
 
@@ -98,8 +98,9 @@ object ActorWithStashSpec {
 
 }
 
-@silent
-class JavaActorWithStashSpec extends StashJavaAPI with JUnitSuiteLike
+// TODO re-enable when lampepfl/dotty#8599 is fixed
+//@silent
+//class JavaActorWithStashSpec extends StashJavaAPI with JUnitSuiteLike
 
 @silent
 class ActorWithStashSpec extends AkkaSpec with DefaultTimeout with BeforeAndAfterEach {
