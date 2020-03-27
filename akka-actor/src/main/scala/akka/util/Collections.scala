@@ -5,7 +5,7 @@
 package akka.util
 
 import scala.collection.immutable
-import scala.annotation.tailrec
+//import scala.annotation.tailrec
 
 /**
  * INTERNAL API
@@ -28,7 +28,11 @@ private[akka] object Collections {
         private[this] var _next: To = _
         private[this] var _hasNext = false
 
-        @tailrec override final def hasNext: Boolean =
+        // https://gitter.im/lampepfl/dotty?at=5e5b85e4ec7f8746aaa6b71d
+        // even without @tailrec, this code still be compiled to while loop
+        // I have checked with scala 2.13.1 & dotty 0.22.0-RC1 using Procyon decompiler v0.5.36 at www.javadecompilers.com
+        /*@tailrec */
+        override final def hasNext: Boolean =
           if (!_hasNext && superIterator.hasNext) { // If we need and are able to look for the next value
             val potentiallyNext = superIterator.next()
             if (isDefinedAt(potentiallyNext)) {
