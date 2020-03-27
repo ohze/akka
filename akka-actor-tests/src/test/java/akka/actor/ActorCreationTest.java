@@ -166,8 +166,9 @@ public class ActorCreationTest extends JUnitSuite {
 
     public Issue20537Reproducer(boolean create) {}
 
+    // https://github.com/lampepfl/dotty/issues/8593
     @Override
-    public void onReceive(Object message) throws Exception {}
+    public void onReceive(Object message) /*throws Exception*/ {}
   }
 
   @Test
