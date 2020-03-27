@@ -955,7 +955,8 @@ object BoundedControlAwareMailbox {
     override def numberOfMessages: Int = size.get()
     override def hasMessages: Boolean = numberOfMessages > 0
 
-    @tailrec
+    // https://gitter.im/lampepfl/dotty?at=5e5b85e4ec7f8746aaa6b71d
+    /*@tailrec */
     final override def dequeue(): Envelope = {
       val count = size.get()
 
