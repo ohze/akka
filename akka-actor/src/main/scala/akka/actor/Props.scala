@@ -59,7 +59,7 @@ object Props extends AbstractProps {
    * Scala API: Returns a Props that has default values except for "creator" which will be a function that creates an instance
    * of the supplied type using the default constructor.
    */
-  def apply[T <: Actor: ClassTag](): Props = apply(defaultDeploy, implicitly[ClassTag[T]].runtimeClass, List.empty)
+  def apply[T <: Actor: ClassTag]: Props = apply(defaultDeploy, implicitly[ClassTag[T]].runtimeClass, List.empty)
 
   /**
    * Scala API: Returns a Props that has default values except for "creator" which will be a function that creates an instance
