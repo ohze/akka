@@ -47,7 +47,7 @@ object AkkaSpec {
 
   def mapToConfig(map: Map[String, Any]): Config = {
     import akka.util.ccompat.JavaConverters._
-    ConfigFactory.parseMap(map.asJava)
+    ConfigFactory.parseMap(map.asInstanceOf[Map[String, AnyRef]].asJava)
   }
 
   def testNameFromCallStack(classToStartFrom: Class[_]): String = {
