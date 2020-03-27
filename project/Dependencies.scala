@@ -43,7 +43,7 @@ object Dependencies {
   }
   val scalaTestVersion = "3.1.1"
   // TODO change back to org.scalatest when scalatest is published for dotty 0.23
-  private def scalatestOrg = Def.setting {
+  private lazy val scalatestOrg = Def.setting {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((0, 23|24)) => "com.sandinh"
       case _                => "org.scalatest"
