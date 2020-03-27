@@ -41,8 +41,19 @@ object ActorSystemSetup {
   /**
    * Java API: Create an [[ActorSystemSetup]] containing all the provided settings
    */
+//  @varargs
+//  def create(settings: Setup*): ActorSystemSetup = apply(settings: _*)
+  // TODO remove
+  // workaround for https://github.com/lampepfl/dotty/issues/7212
+  import scala.collection.immutable
+  def create(): ActorSystemSetup = apply()
+  def create(a1: Setup): ActorSystemSetup = apply(a1)
+  def create(a1: Setup, a2: Setup): ActorSystemSetup = apply(a1, a2)
+  def create(a1: Setup, a2: Setup, a3: Setup): ActorSystemSetup = apply(a1, a2, a3)
+  def create(a1: Setup, a2: Setup, a3: Setup, a4: Setup): ActorSystemSetup = apply(a1, a2, a3, a4)
   @varargs
-  def create(settings: Setup*): ActorSystemSetup = apply(settings: _*)
+  def create(a1: Setup, a2: Setup, a3: Setup, a4: Setup, settings: Setup*): ActorSystemSetup =
+    apply(immutable.Seq(a1, a2, a3, a4) ++ settings: _*)
 }
 
 /**

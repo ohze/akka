@@ -11,7 +11,7 @@ import akka.actor.typed.internal.adapter.SchedulerAdapter
 import com.typesafe.config.Config
 import akka.util.JavaDurationConverters._
 
-import scala.annotation.varargs
+//import scala.annotation.varargs
 
 /**
  * Manual time allows you to do async tests while controlling the scheduler of the system.
@@ -61,10 +61,20 @@ final class ManualTime(delegate: akka.testkit.ExplicitlyTriggeredScheduler) {
    */
   def timePasses(amount: Duration): Unit = delegate.timePasses(amount.asScala)
 
-  @varargs
-  def expectNoMessageFor(duration: Duration, on: TestProbe[_]*): Unit = {
+//  @varargs
+// https://github.com/lampepfl/dotty/issues/7212
+  import scala.collection.immutable
+  def expectNoMessageFor(duration: Duration, on: immutable.Seq[TestProbe[_]]): Unit = {
     delegate.timePasses(duration.asScala)
     on.foreach(_.expectNoMessage(Duration.ZERO))
   }
-
+  // https://github.com/lampepfl/dotty/issues/7212
+  def expectNoMessageFor(duration: Duration): Unit =
+    expectNoMessageFor(duration, immutable.Seq())
+  def expectNoMessageFor(duration: Duration, a1: TestProbe[_]): Unit =
+    expectNoMessageFor(duration, immutable.Seq(a1))
+  def expectNoMessageFor(duration: Duration, a1: TestProbe[_], a2: TestProbe[_]): Unit =
+    expectNoMessageFor(duration, immutable.Seq(a1, a2))
+  def expectNoMessageFor(duration: Duration, a1: TestProbe[_], a2: TestProbe[_], a3: TestProbe[_]): Unit =
+    expectNoMessageFor(duration, immutable.Seq(a1, a2, a3))
 }
