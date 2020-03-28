@@ -1,13 +1,20 @@
+dist: bionic
 language: scala
 
-sudo: false
+services:
+  - docker
 
 scala:
-  - "2.12.11"
-  - "2.13.1"
+  - 0.24.0-bin-20200324-6cd3a9d-NIGHTLY
 
 before_install: curl -Ls https://git.io/jabba | bash && . ~/.jabba/jabba.sh
-install: jabba install "adopt@~1.$TRAVIS_JDK.0-0" && jabba use "$_" && java -Xmx32m -version
+install:
+  # akka build on jdk > 8 require JDK 8 installation
+  - |
+    if [[ "$TRAVIS_JDK" != 'adopt@~1.8.0-0' ]]; then
+      jabba install adopt@~1.8.0-0
+    fi
+  - jabba install "$TRAVIS_JDK" && jabba use "$_" && java -Xmx32m -version
 
 addons:
   apt:
@@ -26,7 +33,21 @@ cache:
     - $HOME/.jabba/jdk
 
 # script for the default 'test' stage:
-script: sbt -jvm-opts .jvmopts-travis -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";update ;mimaReportBinaryIssues ;test:compile ;validateCompile ;headerCheckAll"
+# dotty ready modules:
+#  + actor/compile (no test code)
+#  + actor-typed/{compile, CompileJdk9/compile} (no test code)
+#  + slf4j/test
+#  + actor-testkit/test
+#  + actor-testkit-typed/test
+#  + actor-tests/test
+#  + actor-typed-tests/test
+script:
+  - |
+    if [[ "$TRAVIS_SCALA_VERSION" == 2.* ]]; then
+      sbt -jvm-opts .jvmopts-travis -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";update ;mimaReportBinaryIssues ;test:compile ;validateCompile ;headerCheckAll"
+    else
+      sbt -jvm-opts .jvmopts-travis -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";akka-slf4j/test ;akka-actor-tests/test ;akka-actor-typed-tests/test"
+    fi
 
 jobs:
   include:
@@ -41,14 +62,10 @@ stages:
     if: type == pull_request OR NOT tag =~ ^v
 
 env:
+  jobs:
+    - TRAVIS_JDK="adopt@~1.8.0-0"
+    - TRAVIS_JDK="adopt@~1.11.0-0"
+    - TRAVIS_JDK="graalvm@~20.0.0"
   global:
-    - TRAVIS_JDK=8
     # encrypt with: travis encrypt WHITESOURCE_PASSWORD=...
     - secure: "BCWtUqKG7trI7n5OZE2ReCGXQE/f5P8kXpfcpa5DXJeautBnpH/jettY5ermB5JLl12CisG6S4nS3BSKP4Uf8WPpPeSq402CZYTCbUxMWCvS+9N+kEQrHU7iwYqHQBL/RMy6eIyWPRD+JqxKuvlgfNuSEry9pMagwW7mNQrZgYU="
-
-# safelist
-branches:
-  only:
-  - master
-  - release-2.5
-  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
