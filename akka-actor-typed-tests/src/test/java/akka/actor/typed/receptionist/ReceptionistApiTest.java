@@ -6,6 +6,7 @@ package akka.actor.typed.receptionist;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.ActorSystem;
+import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AskPattern;
 import akka.actor.typed.javadsl.Behaviors;
 
@@ -103,9 +104,10 @@ public class ReceptionistApiTest {
                   })
               .onMessage(
                   Receptionist.Registered.class,
-                  registered -> registered.isForKey(key),
+                  registered -> ((Receptionist.Registered) registered).isForKey(key),
                   registered -> {
-                    ActorRef<String> registree = registered.getServiceInstance(key);
+                    ActorRef<String> registree =
+                        ((Receptionist.Registered) registered).getServiceInstance(key);
                     return Behaviors.same();
                   })
               .build();
