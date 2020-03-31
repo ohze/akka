@@ -45,20 +45,20 @@ public class BehaviorBuilderTest extends JUnitSuite {
             .onMessage(
                 One.class,
                 o -> {
-                  o.foo();
+                  ((One) o).foo();
                   return same();
                 })
-            .onMessage(One.class, o -> o.foo().startsWith("a"), o -> same())
+            .onMessage(One.class, o -> ((One) o).foo().startsWith("a"), o -> same())
             .onMessageUnchecked(
                 MyList.class,
-                (MyList<String> l) -> {
-                  String first = l.get(0);
+                /*(MyList<String> l)*/ l -> {
+                  String first = ((MyList<String>) l).get(0);
                   return Behaviors.<Message>same();
                 })
             .onSignal(
                 Terminated.class,
                 t -> {
-                  System.out.println("Terminating along with " + t.getRef());
+                  System.out.println("Terminating along with " + ((Terminated) t).getRef());
                   return stopped();
                 })
             .build();

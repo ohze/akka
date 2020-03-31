@@ -83,7 +83,7 @@ public final class ActorContextPipeToSelfTest extends JUnitSuite {
                           "complete-with-null",
                           () -> {
                             future.complete(null);
-                            return Behaviors.same();
+                            return (Behavior<String>) (Object) Behaviors.same();
                           })
                       .onAnyMessage(
                           msg -> {

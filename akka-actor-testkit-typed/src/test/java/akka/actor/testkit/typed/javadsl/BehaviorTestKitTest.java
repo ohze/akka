@@ -138,7 +138,8 @@ public class BehaviorTestKitTest extends JUnitSuite {
                               i -> {
                                 context.spawn(childInitial, "child" + i);
                               });
-                      return Behaviors.same();
+                      // https://github.com/lampepfl/dotty/issues/8631
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     SpawnChildrenAnonymous.class,
@@ -148,7 +149,7 @@ public class BehaviorTestKitTest extends JUnitSuite {
                               i -> {
                                 context.spawnAnonymous(childInitial);
                               });
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     SpawnChildrenWithProps.class,
@@ -158,7 +159,7 @@ public class BehaviorTestKitTest extends JUnitSuite {
                               i -> {
                                 context.spawn(childInitial, "child" + i, message.props);
                               });
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     SpawnChildrenAnonymousWithProps.class,
@@ -168,13 +169,13 @@ public class BehaviorTestKitTest extends JUnitSuite {
                               i -> {
                                 context.spawnAnonymous(childInitial, message.props);
                               });
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     CreateMessageAdapter.class,
                     message -> {
                       context.messageAdapter(message.clazz, message.f);
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     SpawnWatchAndUnWatch.class,
@@ -182,14 +183,14 @@ public class BehaviorTestKitTest extends JUnitSuite {
                       ActorRef<Action> c = context.spawn(childInitial, message.name);
                       context.watch(c);
                       context.unwatch(c);
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     SpawnAndWatchWith.class,
                     message -> {
                       ActorRef<Action> c = context.spawn(childInitial, message.name);
                       context.watchWith(c, message);
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     SpawnSession.class,
@@ -202,14 +203,14 @@ public class BehaviorTestKitTest extends JUnitSuite {
                                     return Behaviors.same();
                                   }));
                       message.replyTo.tell(session);
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     KillSession.class,
                     message -> {
                       context.stop(message.session);
                       message.replyTo.tell(Done.getInstance());
-                      return Behaviors.same();
+                      return (Behavior<Command>) (Object) Behaviors.same();
                     })
                 .onMessage(
                     Log.class,
