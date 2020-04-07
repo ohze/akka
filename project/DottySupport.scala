@@ -43,6 +43,28 @@ object DottySupport {
       )
       .settings(Test / scalacOptions trans Transform.add("-language:postfixOps"))
       .settings((extraConfigs :+ Compile :+ Test).map(_ / scalacOptions trans ScalacOptionsTransform))
+      .settings(dottyBugWorkaround(p.id))
+  }
+
+  // TODO remove when the corresponding dotty bug is fix
+  private def dottyBugWorkaround(projectId: String): Seq[Setting[_]] = projectId match {
+    case "akka-actor-tests" => Seq(
+      // lampepfl/dotty#8554 - Need this to fix akka-actor-tests/test:compile errors in dotty:
+      // Bad symbolic reference. A signature refers to Nullable/T in package javax.annotation which is not available.
+      // javax.annotation.Nullable is used in jimfs, docker-client, guava,..
+      libraryDependencies trans Transform.add(
+        "com.google.code.findbugs" % "jsr305" % "3.0.2" % "test"
+      ),
+      // lampepfl/dotty#8599
+      Test / sources trans (Test / javaSource){ base =>
+        val files = Seq(
+          "akka/actor/StashJavaAPITestActors.java",
+          "akka/actor/StashJavaAPI.java"
+        ).map(base / _)
+        Transform.remove(files: _*)
+      }
+    )
+    case _ => Nil
   }
 
   implicit class ModuleIDOps(val moduleID: ModuleID) extends AnyVal {
