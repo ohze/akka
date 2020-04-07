@@ -81,6 +81,7 @@ lazy val root = Project(id = "akka", base = file("."))
   .settings(unidocRootIgnoreProjects := Seq(remoteTests, benchJmh, protobuf, protobufV3, akkaScalaNightly, docs))
   .settings(unmanagedSources in (Compile, headerCreate) := (baseDirectory.value / "project").**("*.scala").get)
   .enablePlugins(CopyrightHeaderForBuild)
+  .dottySupport() // todo remove
 
 lazy val actor = akkaModule("akka-actor")
   .settings(Dependencies.actor)
@@ -102,6 +103,7 @@ lazy val akkaScalaNightly = akkaModule("akka-scala-nightly")
   .aggregate(aggregatedProjects: _*)
   .disablePlugins(MimaPlugin)
   .disablePlugins(ValidatePullRequest, MimaPlugin, CopyrightHeaderInPr)
+  .dottySupport() // todo remove
 
 lazy val benchJmh = akkaModule("akka-bench-jmh")
   .enablePlugins(Jdk9)
@@ -111,6 +113,7 @@ lazy val benchJmh = akkaModule("akka-bench-jmh")
   .settings(javacOptions += "-parameters") // for Jackson
   .enablePlugins(JmhPlugin, ScaladocNoVerificationOfDiagrams, NoPublish, CopyrightHeader)
   .disablePlugins(MimaPlugin, WhiteSourcePlugin, ValidatePullRequest, CopyrightHeaderInPr)
+  .dottySupport() // todo remove
 
 lazy val cluster = akkaModule("akka-cluster")
   .dependsOn(remote, remoteTests % "test->test", testkit % "test->test", jackson % "test->test")
@@ -121,6 +124,7 @@ lazy val cluster = akkaModule("akka-cluster")
   .settings(parallelExecution in Test := false)
   .configs(MultiJvm)
   .enablePlugins(MultiNodeScalaTest)
+  .dottySupport() // todo remove
 
 lazy val clusterMetrics = akkaModule("akka-cluster-metrics")
   .dependsOn(
@@ -135,6 +139,7 @@ lazy val clusterMetrics = akkaModule("akka-cluster-metrics")
   .settings(parallelExecution in Test := false)
   .configs(MultiJvm)
   .enablePlugins(MultiNodeScalaTest)
+  .dottySupport() // todo remove
 
 lazy val clusterSharding = akkaModule("akka-cluster-sharding")
 // TODO akka-persistence dependency should be provided in pom.xml artifact.
@@ -153,6 +158,7 @@ lazy val clusterSharding = akkaModule("akka-cluster-sharding")
   .settings(Protobuf.settings)
   .configs(MultiJvm)
   .enablePlugins(MultiNode, ScaladocNoVerificationOfDiagrams)
+  .dottySupport() // todo remove
 
 lazy val clusterTools = akkaModule("akka-cluster-tools")
   .dependsOn(cluster % "compile->compile;test->test;multi-jvm->multi-jvm", coordination, jackson % "test->test")
@@ -162,6 +168,7 @@ lazy val clusterTools = akkaModule("akka-cluster-tools")
   .settings(Protobuf.settings)
   .configs(MultiJvm)
   .enablePlugins(MultiNode, ScaladocNoVerificationOfDiagrams)
+  .dottySupport() // todo remove
 
 lazy val distributedData = akkaModule("akka-distributed-data")
   .dependsOn(cluster % "compile->compile;test->test;multi-jvm->multi-jvm", jackson % "test->test")
@@ -171,6 +178,7 @@ lazy val distributedData = akkaModule("akka-distributed-data")
   .settings(Protobuf.settings)
   .configs(MultiJvm)
   .enablePlugins(MultiNodeScalaTest)
+  .dottySupport() // todo remove
 
 lazy val docs = akkaModule("akka-docs")
   .configs(akka.Jdk9.TestJdk9)
@@ -212,6 +220,7 @@ lazy val docs = akkaModule("akka-docs")
     Jdk9)
   .disablePlugins(MimaPlugin, WhiteSourcePlugin)
   .disablePlugins(ScalafixPlugin)
+  .dottySupport() // todo remove
 
 lazy val jackson = akkaModule("akka-serialization-jackson")
   .dependsOn(
@@ -225,6 +234,7 @@ lazy val jackson = akkaModule("akka-serialization-jackson")
   .settings(OSGi.jackson)
   .settings(javacOptions += "-parameters")
   .enablePlugins(ScaladocNoVerificationOfDiagrams)
+  .dottySupport() // todo remove
 
 lazy val multiNodeTestkit = akkaModule("akka-multi-node-testkit")
   .dependsOn(remote, testkit)
@@ -232,6 +242,7 @@ lazy val multiNodeTestkit = akkaModule("akka-multi-node-testkit")
   .settings(Protobuf.settings)
   .settings(AutomaticModuleName.settings("akka.remote.testkit"))
   .settings(AkkaBuild.mayChangeSettings)
+  .dottySupport() // todo remove
 
 lazy val osgi = akkaModule("akka-osgi")
   .dependsOn(actor)
@@ -239,6 +250,7 @@ lazy val osgi = akkaModule("akka-osgi")
   .settings(AutomaticModuleName.settings("akka.osgi"))
   .settings(OSGi.osgi)
   .settings(parallelExecution in Test := false)
+  .dottySupport() // todo remove
 
 lazy val persistence = akkaModule("akka-persistence")
   .dependsOn(actor, stream, testkit % "test->test")
@@ -247,6 +259,7 @@ lazy val persistence = akkaModule("akka-persistence")
   .settings(OSGi.persistence)
   .settings(Protobuf.settings)
   .settings(fork in Test := true)
+  .dottySupport() // todo remove
 
 lazy val persistenceQuery = akkaModule("akka-persistence-query")
   .dependsOn(stream, persistence % "compile->compile;test->test", streamTestkit % "test")
@@ -255,6 +268,7 @@ lazy val persistenceQuery = akkaModule("akka-persistence-query")
   .settings(OSGi.persistenceQuery)
   .settings(fork in Test := true)
   .enablePlugins(ScaladocNoVerificationOfDiagrams)
+  .dottySupport() // todo remove
 
 lazy val persistenceShared = akkaModule("akka-persistence-shared")
   .dependsOn(persistence % "test->test", testkit % "test->test", remote % "test")
@@ -263,6 +277,7 @@ lazy val persistenceShared = akkaModule("akka-persistence-shared")
   .settings(fork in Test := true)
   .enablePlugins(NoPublish)
   .disablePlugins(MimaPlugin, WhiteSourcePlugin)
+  .dottySupport() // todo remove
 
 lazy val persistenceTck = akkaModule("akka-persistence-tck")
   .dependsOn(persistence % "compile->compile;test->test", testkit % "compile->compile;test->test")
@@ -271,6 +286,7 @@ lazy val persistenceTck = akkaModule("akka-persistence-tck")
   //.settings(OSGi.persistenceTck) TODO: we do need to export this as OSGi bundle too?
   .settings(fork in Test := true)
   .disablePlugins(MimaPlugin)
+  .dottySupport() // todo remove
 
 lazy val persistenceTestkit = akkaModule("akka-persistence-testkit")
   .dependsOn(
@@ -280,12 +296,14 @@ lazy val persistenceTestkit = akkaModule("akka-persistence-testkit")
   .settings(Dependencies.persistenceTestKit)
   .settings(AutomaticModuleName.settings("akka.persistence.testkit"))
   .disablePlugins(MimaPlugin)
+  .dottySupport() // todo remove
 
 lazy val protobuf = akkaModule("akka-protobuf")
   .settings(OSGi.protobuf)
   .settings(AutomaticModuleName.settings("akka.protobuf"))
   .enablePlugins(ScaladocNoVerificationOfDiagrams)
   .disablePlugins(MimaPlugin)
+  .dottySupport() // todo remove
 
 lazy val protobufV3 = akkaModule("akka-protobuf-v3")
   .settings(AutomaticModuleName.settings("akka.protobuf.v3"))
@@ -308,6 +326,7 @@ lazy val protobufV3 = akkaModule("akka-protobuf-v3")
     fullClasspath in assembly := (managedClasspath in Runtime).value, // otherwise, there's a cyclic dependency between packageBin and assembly
     test in assembly := {}, // assembly runs tests for unknown reason which introduces another cyclic dependency to packageBin via exportedJars
     description := "Akka Protobuf V3 is a shaded version of the protobuf runtime. Original POM: https://github.com/protocolbuffers/protobuf/blob/v3.9.0/java/pom.xml")
+  .dottySupport() // todo remove
 
 lazy val remote =
   akkaModule("akka-remote")
@@ -325,6 +344,7 @@ lazy val remote =
     .settings(Protobuf.settings)
     .settings(parallelExecution in Test := false)
     .enablePlugins(Jdk9)
+  .dottySupport() // todo remove
 
 lazy val remoteTests = akkaModule("akka-remote-tests")
   .dependsOn(
@@ -339,6 +359,7 @@ lazy val remoteTests = akkaModule("akka-remote-tests")
   .configs(MultiJvm)
   .enablePlugins(MultiNodeScalaTest, NoPublish)
   .disablePlugins(MimaPlugin, WhiteSourcePlugin)
+  .dottySupport() // todo remove
 
 lazy val slf4j = akkaModule("akka-slf4j")
   .dependsOn(actor, testkit % "test->test")
@@ -354,6 +375,7 @@ lazy val stream = akkaModule("akka-stream")
   .settings(OSGi.stream)
   .settings(Protobuf.settings)
   .enablePlugins(BoilerplatePlugin, Jdk9)
+  .dottySupport() // todo remove
 
 lazy val streamTestkit = akkaModule("akka-stream-testkit")
   .dependsOn(stream, testkit % "compile->compile;test->test")
@@ -361,6 +383,7 @@ lazy val streamTestkit = akkaModule("akka-stream-testkit")
   .settings(AutomaticModuleName.settings("akka.stream.testkit"))
   .settings(OSGi.streamTestkit)
   .disablePlugins(MimaPlugin)
+  .dottySupport() // todo remove
 
 lazy val streamTests = akkaModule("akka-stream-tests")
   .configs(akka.Jdk9.TestJdk9)
@@ -368,6 +391,7 @@ lazy val streamTests = akkaModule("akka-stream-tests")
   .settings(Dependencies.streamTests)
   .enablePlugins(NoPublish, Jdk9)
   .disablePlugins(MimaPlugin, WhiteSourcePlugin)
+  .dottySupport() // todo remove
 
 lazy val streamTestsTck = akkaModule("akka-stream-tests-tck")
   .dependsOn(streamTestkit % "test->test", stream)
@@ -380,6 +404,7 @@ lazy val streamTestsTck = akkaModule("akka-stream-tests-tck")
     fork in Test := true)
   .enablePlugins(NoPublish)
   .disablePlugins(MimaPlugin, WhiteSourcePlugin)
+  .dottySupport() // todo remove
 
 lazy val testkit = akkaModule("akka-testkit")
   .dependsOn(actor)
@@ -419,6 +444,7 @@ lazy val persistenceTyped = akkaModule("akka-persistence-typed")
   .settings(Dependencies.persistenceShared)
   .settings(AutomaticModuleName.settings("akka.persistence.typed"))
   .settings(OSGi.persistenceTyped)
+  .dottySupport() // todo remove
 
 lazy val clusterTyped = akkaModule("akka-cluster-typed")
   .dependsOn(
@@ -439,6 +465,7 @@ lazy val clusterTyped = akkaModule("akka-cluster-typed")
   .settings(Protobuf.importPath := Some(baseDirectory.value / ".." / "akka-remote" / "src" / "main" / "protobuf"))
   .configs(MultiJvm)
   .enablePlugins(MultiNodeScalaTest)
+  .dottySupport() // todo remove
 
 lazy val clusterShardingTyped = akkaModule("akka-cluster-sharding-typed")
   .dependsOn(
@@ -458,6 +485,7 @@ lazy val clusterShardingTyped = akkaModule("akka-cluster-sharding-typed")
   .settings(Protobuf.importPath := Some(baseDirectory.value / ".." / "akka-remote" / "src" / "main" / "protobuf"))
   .configs(MultiJvm)
   .enablePlugins(MultiNodeScalaTest)
+  .dottySupport() // todo remove
 
 lazy val streamTyped = akkaModule("akka-stream-typed")
   .dependsOn(
@@ -468,6 +496,7 @@ lazy val streamTyped = akkaModule("akka-stream-typed")
     actorTypedTests % "test->test")
   .settings(AutomaticModuleName.settings("akka.stream.typed"))
   .enablePlugins(ScaladocNoVerificationOfDiagrams)
+  .dottySupport() // todo remove
 
 lazy val actorTestkitTyped = akkaModule("akka-actor-testkit-typed")
   .dependsOn(actorTyped, slf4j, testkit % "compile->compile;test->test")
@@ -487,12 +516,14 @@ lazy val discovery = akkaModule("akka-discovery")
   .settings(Dependencies.discovery)
   .settings(AutomaticModuleName.settings("akka.discovery"))
   .settings(OSGi.discovery)
+  .dottySupport() // todo remove
 
 lazy val coordination = akkaModule("akka-coordination")
   .dependsOn(actor, testkit % "test->test", actorTests % "test->test", cluster % "test->test")
   .settings(Dependencies.coordination)
   .settings(AutomaticModuleName.settings("akka.coordination"))
   .settings(OSGi.coordination)
+  .dottySupport() // todo remove
 
 def akkaModule(name: String): Project =
   Project(id = name, base = file(name))
