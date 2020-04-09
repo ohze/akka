@@ -6,6 +6,23 @@ services:
 
 scala:
   - 0.24.0-bin-20200324-6cd3a9d-NIGHTLY
+  - 2.13.1
+  - 2.12.11
+env:
+  - TRAVIS_JDK="adopt@~1.8.0-0"
+  - TRAVIS_JDK="adopt@~1.11.0-0"
+  - TRAVIS_JDK="graalvm@~20.0.0"
+# for scala 2: test only 2.12 @ 1.8 and 2.13 @ graalvm
+jobs:
+  exclude:
+    - scala: 2.13.1
+      env: TRAVIS_JDK="adopt@~1.8.0-0"
+    - scala: 2.13.1
+      env: TRAVIS_JDK="adopt@~1.11.0-0"
+    - scala: 2.12.11
+      env: TRAVIS_JDK="adopt@~1.11.0-0"
+    - scala: 2.12.11
+      env: TRAVIS_JDK="graalvm@~20.0.0"
 
 before_install: curl -Ls https://git.io/jabba | bash && . ~/.jabba/jabba.sh
 install:
@@ -15,11 +32,6 @@ install:
       jabba install adopt@~1.8.0-0
     fi
   - jabba install "$TRAVIS_JDK" && jabba use "$_" && java -Xmx32m -version
-
-addons:
-  apt:
-    packages:
-    - graphviz
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
@@ -42,30 +54,4 @@ cache:
 #  + actor-tests/test
 #  + actor-typed-tests/test
 script:
-  - |
-    if [[ "$TRAVIS_SCALA_VERSION" == 2.* ]]; then
-      sbt -jvm-opts .jvmopts-travis -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";update ;mimaReportBinaryIssues ;test:compile ;validateCompile ;headerCheckAll"
-    else
-      sbt -jvm-opts .jvmopts-travis -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";akka-slf4j/test ;akka-actor-tests/test ;akka-actor-typed-tests/test"
-    fi
-
-jobs:
-  include:
-    - stage: whitesource
-      name: whitesource
-      script: git branch -f "$TRAVIS_BRANCH" && git checkout "$TRAVIS_BRANCH" && sbt whitesourceCheckPolicies whitesourceUpdate
-
-stages:
-  - name: whitesource
-    if: repo = akka/akka AND ((branch = master AND type != pull_request) OR tag =~ ^v) AND env(TRAVIS_SCALA_VERSION) =~ ^2.12
-  - name: test
-    if: type == pull_request OR NOT tag =~ ^v
-
-env:
-  jobs:
-    - TRAVIS_JDK="adopt@~1.8.0-0"
-    - TRAVIS_JDK="adopt@~1.11.0-0"
-    - TRAVIS_JDK="graalvm@~20.0.0"
-  global:
-    # encrypt with: travis encrypt WHITESOURCE_PASSWORD=...
-    - secure: "BCWtUqKG7trI7n5OZE2ReCGXQE/f5P8kXpfcpa5DXJeautBnpH/jettY5ermB5JLl12CisG6S4nS3BSKP4Uf8WPpPeSq402CZYTCbUxMWCvS+9N+kEQrHU7iwYqHQBL/RMy6eIyWPRD+JqxKuvlgfNuSEry9pMagwW7mNQrZgYU="
+  - sbt -jvm-opts .jvmopts-travis -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";akka-slf4j/test ;akka-actor-tests/test ;akka-actor-typed-tests/test"
