@@ -5,7 +5,7 @@ services:
   - docker
 
 scala:
-  - 0.24.0-bin-20200324-6cd3a9d-NIGHTLY
+  - 0.24.0-bin-20200408-4cc224b-NIGHTLY
   - 2.13.1
   - 2.12.11
 env:
