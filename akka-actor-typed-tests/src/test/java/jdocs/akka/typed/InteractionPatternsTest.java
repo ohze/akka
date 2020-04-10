@@ -891,14 +891,18 @@ public class InteractionPatternsTest extends JUnitSuite {
   public void timers() throws Exception {
     TestProbe<Buncher.Batch> probe = testKit.createTestProbe(Buncher.Batch.class);
     ActorRef<Buncher.Command> buncher =
-        testKit.spawn(Buncher.create(probe.ref(), Duration.ofSeconds(1), 10), "batcher");
+        testKit.spawn(
+            Buncher.create(probe.ref(), probe.settings().dilated(Duration.ofSeconds(1)), 10),
+            "batcher");
 
     Buncher.ExcitingMessage msgOne = new Buncher.ExcitingMessage("one");
     Buncher.ExcitingMessage msgTwo = new Buncher.ExcitingMessage("two");
     buncher.tell(msgOne);
     buncher.tell(msgTwo);
     probe.expectNoMessage();
-    probe.expectMessage(Duration.ofSeconds(2), new Buncher.Batch(Arrays.asList(msgOne, msgTwo)));
+    probe.expectMessage(
+        probe.settings().dilated(Duration.ofSeconds(2)),
+        new Buncher.Batch(Arrays.asList(msgOne, msgTwo)));
   }
 
   @Test
