@@ -4,12 +4,15 @@
 
 package akka.actor.typed.delivery
 
+import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.LogCapturing
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.delivery.ConsumerController.DeliverThenStop
 import akka.actor.typed.delivery.internal.ConsumerControllerImpl
 import akka.actor.typed.delivery.internal.ProducerControllerImpl
 import org.scalatest.wordspec.AnyWordSpecLike
+
+import scala.concurrent.duration.FiniteDuration
 
 class ConsumerControllerSpec
     extends ScalaTestWithActorTestKit("""
@@ -94,7 +97,9 @@ class ConsumerControllerSpec
       nextId()
       val windowSize = 20
       val consumerController =
-        spawn(ConsumerController[TestConsumer.Job](), s"consumerController-${idCount}")
+        spawn(
+          ConsumerController[TestConsumer.Job](settings.withResendInterval(testKitSettings.dilated(settings.resendInterval))),
+          s"consumerController-${idCount}")
           .unsafeUpcast[ConsumerControllerImpl.InternalCommand]
       val producerControllerProbe = createTestProbe[ProducerControllerImpl.InternalCommand]()
 

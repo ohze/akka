@@ -54,4 +54,4 @@ cache:
 #  + actor-tests/test
 #  + actor-typed-tests/test
 script:
-  - sbt -Dakka.actor.testkit.typed.timefactor=6 -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";akka-actor-typed-tests/test ;akka-slf4j/test ;akka-actor-tests/test"
+  - sbt -Dakka.actor.testkit.typed.timefactor=3 -Dakka.build.scalaVersion=$TRAVIS_SCALA_VERSION ";akka-actor-typed-tests/test ;akka-slf4j/test ;akka-actor-tests/test"
