@@ -168,11 +168,6 @@ private object DottySupportInternal {
       case a => a
     }
 
-    private def scalatestIntransitive(f: ModuleID => Boolean): T[Seq[ModuleID]] = _.map {
-      case a if f(a) => a.excludeAll("org.scalatest")
-      case a => a
-    }
-    
     import Dependencies.Compile._
 
     def apply(scalaVersion: String): T[Seq[ModuleID]] = T(
@@ -181,17 +176,12 @@ private object DottySupportInternal {
         "org.scala-lang.modules" %% "scala-java8-compat" % "*",
         jacksonScala,
         Test.scalacheck,
-        Test.scalatestTestNG,
-        Test.scalatestMockito,
         Docs.sprayJson
       )(_ withDottyCompat scalaVersion),
       trans(
         "com.github.ghik" %% "silencer-lib" % "*"
       )(_ withDottyFullCompat scalaVersion),
       remove("com.github.ghik" %% "silencer-plugin" % "*"),
-      scalatestIntransitive(m => m.organization == "org.scalatestplus"),
-      trans(Test.scalatestScalaCheck)(_.withOrganization("dev.travisbrown")),
-      trans(Test.scalatest, Test.scalatestJUnit)(_.withOrganization("com.sandinh"))
     )
   }
 }
