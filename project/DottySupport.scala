@@ -61,7 +61,7 @@ object DottySupport {
 
     private val dotty2scalaMap = Seq(
       "0.19.0-RC1" -> "0.24.0-bin-20200422-0db5976-NIGHTLY" -> "2.13.1",
-      "0.24.0-bin-20200423-38cb5e3-NIGHTLY" -> "0.25.0" -> "2.13.2"
+      "0.24.0-bin-20200423-38cb5e3-NIGHTLY" -> "0.26.0" -> "2.13.2"
     ).map { case ((x, y), v) => VersionNumber(x) -> VersionNumber(y) -> CrossVersion.constant(v) }
 
     private def dotty2scala(scalaVersion: VersionNumber) = dotty2scalaMap.collectFirst {
