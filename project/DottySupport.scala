@@ -41,6 +41,7 @@ object DottySupport {
       .settings(
         organization ifDotty "com.sandinh",
         publishTo := sonatypePublishToBundle.value,
+        Compile / doc / sources := Nil,
       )
   }
 
